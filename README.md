@@ -1,7 +1,7 @@
 # LetsLearnCH32V003
 
 Let's learn how to program the "10 cent" CH32V003 chip in plain C 
-on [ch32fun](https://github.com/cnlohr/ch32fun), as a series of steps.
+on [ch32fun](https://github.com/cnlohr/ch32fun), as a series of small sketch stages.
 
 ## Assumptions
 
@@ -21,19 +21,20 @@ For these examples, this [common CH32V003 dev board](https://link.amazon/B0gMU10
 will be used.  It contains the CH32V003F4P6 (TSSOP-20) version of the chip.
 The dev boards are cheap: [5 for $10 on Amazon](https://link.amazon/B0gMU10gb).
 There's very litle documenation for this specific board. This [Zephyr page](https://docs.zephyrproject.org/latest/boards/wch/ch32v003f4p6_dev_board/doc/)
-is the best I've found.  The button is connected to PC0 and VDD.
-The LED is connected to PD1 via a resistor to Gnd. 
-PD1 is the SWIO programming line, thus not usable as a status LED, but lights
-when programming or monitoring.
+is the best I've found.  
+The interesting pins: button is across PC0 and VDD, LED on PD1 
+(PD1 is SWIO program, not usable as GPIO, but lights while programming), 
+TX / RX on PD5 / PD6 (just labeling, no circuitry)
 
 <img src="./docs/CH32V003F4P6-devboard-top.jpg" width="300">
 <img src="./docs/CH32V003F4P6-devboard-bot.jpg" width="300">
 
 For use in a breadboard, I like to solder the header pins on and put a 3-pin 
-female header for the programming pins (which can also provide power to the board),
-like this:
+female header instead of male pins for the programming pins. The programming
+port can also supply power to the board.
 
 <img src="./docs/CH32V003F4P6_devboard_soldered.jpg" width="400">
+
 
 ## Hardware programmer setup
 
@@ -56,10 +57,11 @@ esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset \
   0x8000 build/partition_table/partition-table.bin
 ```
 
-The solder three jumpers to the ESP32-S2 board: Gnd, 3V3, SWIO.
-I like the [Lolin S2Mini](https://link.amazon/B0aM3kL9F). The result looks like:
+The solder three jumpers to the ESP32-S2 board: Gnd, 3V3, IO6 for SWIO.
+I like the [Lolin S2Mini](https://link.amazon/B0aM3kL9F). The result looks like.
+You may want to do a female header here and male on the board.
 
-[img here to be added]
+<img src="./docs/ESP32-S2_CH32V003Programmer.jpg" width="400">
 
 ## Breadboard setup
 
