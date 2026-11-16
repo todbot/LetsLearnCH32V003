@@ -29,7 +29,7 @@
 #include "ws2812b_dma_spi_led_driver.h"
 
 #define WHO_AM_I_VAL (0xC3)
-#define FW_VERSION_VAL (0x06)
+#define FW_VERSION_VAL (60)
 #define BRIGHTNESS_DEFAULT (32)  // 8 LEDs full white is ~480mA, keep it low
 
 enum {

@@ -19,7 +19,7 @@
 #include "ws2812b_dma_spi_led_driver.h"
 
 #define WHO_AM_I_VAL (0xC3)
-#define FW_VERSION_VAL (0x03)
+#define FW_VERSION_VAL (30)
 
 enum {
     REG_WHO_AM_I   = 0x00,

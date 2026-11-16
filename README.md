@@ -2,11 +2,73 @@
 
 Learning the CH32V003 in small steps, in plain C on [ch32fun](https://github.com/cnlohr/ch32fun):
 register-level, no WCH HAL. Each stage is a standalone ch32fun project that adds one concept.
-Later stages copy code forward on purpose, so each can be read alone. Stages are numbered by
-tens so new ones can slot in between.
+Later stages copy code forward on purpose, so each can be read alone. 
 
-The stages build up to [touchwheelqwiic](https://github.com/todbot/touchwheelqwiic), an I2C
-peripheral (Qwiic/Stemma QT) with captouch pads (wheel or buttons) and WS2812 LEDs.
+## Assumptions
+
+This is for those experienced with programming Arduino or C on small MCUs.
+The CH32V003 has 16 kB and 2 kB RAM, very similar to the original Arduino, 
+kind of like ATtinys today. The CH32V003 is more capable than the ATmega168 
+in the original Arduino.
+The device doesn't support USB and needs an external programmer.
+
+These examples are all based on [cnlohr's ch32fun](https://github.com/cnlohr/ch32fun)
+open-source miniaml C-based HAL for the CH32 chips. 
+Many of these examples are just reworked examples in ch32fun. 
+
+## Software setup
+ 
+For details for your OS, see the [ch32fun wiki on installation](https://github.com/cnlohr/ch32fun/wiki/Installation). On my Mac, I had most of these tools already installed, but 
+quickly:
+
+```sh
+# risc-v tools
+brew trust riscv-software-src/riscv
+brew tap riscv-software-src/riscv
+brew install riscv-tools
+# libusb for minichlink
+brew install pkg-config libusb
+```
+
+Get this repo and build the `minichlink` programmer app:
+```
+# get ch32fun 
+git clone https://github.com/todbot/CH32V003_Learning
+cd CH32V003_Learning
+git submodule update --init
+cd ch32fun/minchlink
+make
+```
+
+## Hardware dev board 
+
+For these examples, this [common CH32V003 dev board](https://link.amazon/B0gMU10gb)
+will be used.  It contains the CH32V003F4P6 (SOIC-16) version of the chip.
+These dev boards can be had for cheap: [5 for $10 on Amazon](https://link.amazon/B0gMU10gb).
+
+<img src="./docs/CH32V003F4P6-devboard-top.jpg" width="300">
+<img src="./docs/CH32V003F4P6-devboard-bot.jpg" width="300">
+
+
+## Hardware programmer
+
+The official programmer is a "WCH Link-E". This can be had for about $5 on Aliexpress.
+I didn't want to wait. Thankfully you can make a CH32 programmer from another 
+dev board. I used chlohr's ESP32-S2-based "ch32v003programmer":
+
+Steps:
+- Download https://github.com/cnlohr/esp32s2-cookbook to get "ch32v003programmer" then do:
+- Plug in a ESP32-S2 board, hold BOOT + tap RESET to put into bootloader mode
+- Install ch32v003programmer
+
+```sh
+git clone https://github.com/cnlohr/esp32s2-cookbook
+cd esp32s2-cookbook/ch32v003programmer
+esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 4MB 0x1000 build/bootloader/bootloader.bin 0x10000 build/usb_sandbox.bin 0x8000 build/partition_table/partition-table.bin
+```
+
+
+## Examples
 
 | Stage | What it adds |
 |---|---|
@@ -19,8 +81,6 @@ peripheral (Qwiic/Stemma QT) with captouch pads (wheel or buttons) and WS2812 LE
 | `50_i2c_touch` | I2C target reporting touch status/pos/raw, INT pin |
 | `60_i2c_touch_leds` | complete custom-register device + Python driver |
 | `70_seesaw` | Adafruit seesaw compatible (STATUS, NEOPIXEL, TOUCH) |
-| `80_i2c_patterns` | 30 + color patterns and I2C address stored in the last flash page |
-| `90_i2c_patterns_1k` | 80 with a 1K pattern area: 255 steps, per-LED steps and overlapping fades |
 
 Each I2C stage has a CircuitPython test in `host/`.
 
@@ -59,17 +119,6 @@ Check each stage before moving to the next:
    - stock `adafruit_seesaw` connects
    - `touch_read(4..7)` tracks the pads
    - NeoPixels light
-8. **80_i2c_patterns** (`host/code.py`)
-   - fresh chip plays the default red/green/blue fade at boot
-   - after `code.py` saves its pattern, the read-back matches and the pattern plays
-   - the pattern still plays after a power cycle
-   - `set_address()` moves the device to the new address after reset
-   - writing LED regs stops playback
-9. **90_i2c_patterns_1k** (`host/code.py`)
-   - fresh chip plays the default fade
-   - `upload()` reports saved ok, and the chase plays with overlapping fades
-   - the pattern survives a power cycle
-   - `make build` fails if the firmware would reach 0x3C00
 
 ## Setup
 
@@ -114,18 +163,18 @@ to the target board pins (see Target boards below).
 
 ### Pins used per stage (dev board)
 
-| Pin | 10 | 15 | 20 | 30 | 40 | 45 | 50 | 60 | 70 | 80 | 90 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
-| PC0 | LED | LED | | | | | | | | | |
-| PC1 | | | | SDA | | | SDA | SDA | SDA | SDA | SDA |
-| PC2 | | | | SCL | | | SCL | SCL | SCL | SCL | SCL |
-| PC4 | | | | | pad0 | pad0 | pad0 | pad0 | pad0 | | |
-| PC6 | | | LEDs | LEDs | | LEDs | | LEDs | LEDs | LEDs | LEDs |
-| PC7 | | | | | | | INT | INT | | | |
-| PD2 | | | | | pad1 | pad1 | pad1 | pad1 | pad1 | | |
-| PD3 | | | | | pad2 | pad2 | pad2 | pad2 | pad2 | | |
-| PD4 | | | | | pad3 | pad3 | pad3 | pad3 | pad3 | | |
+| Pin | 10 | 15 | 20 | 30 | 40 | 45 | 50 | 60 | 70 |
+|---|---|---|---|---|---|---|---|---|---|
+| PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
+| PC0 | LED | LED | | | | | | | |
+| PC1 | | | | SDA | | | SDA | SDA | SDA |
+| PC2 | | | | SCL | | | SCL | SCL | SCL |
+| PC4 | | | | | pad0 | pad0 | pad0 | pad0 | pad0 |
+| PC6 | | | LEDs | LEDs | | LEDs | | LEDs | LEDs |
+| PC7 | | | | | | | INT | INT | |
+| PD2 | | | | | pad1 | pad1 | pad1 | pad1 | pad1 |
+| PD3 | | | | | pad2 | pad2 | pad2 | pad2 | pad2 |
+| PD4 | | | | | pad3 | pad3 | pad3 | pad3 | pad3 |
 
 What each pin does:
 - **SWIO (PD1):** programming, and debug printf (`make monitor`), in every
@@ -338,105 +387,6 @@ Processing in `touch_update()`, per pad:
 - autoshow: LEDs update after any write that reaches 0x20+
 - feedback: firmware lights the LED under your finger (overwrites LED regs)
 - INT asserts while `TOUCH_EVENTS != 0` and `CONFIG` bit0 is set
-
-## Pattern mode (stage 80)
-
-Same registers as 30, plus playback of a color pattern stored in the last 64-byte flash page
-(`0x08003FC0`, the chip's "fast" erase/program unit). The same page holds the I2C address.
-
-| Addr | R/W | Name | Notes |
-|---|---|---|---|
-| 0x06 | W | `COMMAND` | 0x01 show, 0x10 play, 0x11 stop, 0x12 save, 0x13 load, 0xA5 reset |
-| 0x38 | R | `PATT_STATUS` | bit0 = playing |
-| 0x39 | R | `PATT_POS` | current step |
-| 0x40-0x7F | R/W | `PAGE` | RAM copy of the flash page, layout below |
-
-How to change the pattern or address:
-1. Write into `PAGE`.
-2. Send `COMMAND` save (0x12). That erases and writes the flash page, which takes ~6ms, and the
-   device clock-stretches meanwhile.
-3. Read `PAGE` back to verify.
-
-`COMMAND` load (0x13) throws away unsaved edits.
-
-Page layout (offsets from 0x40):
-
-| Offset | Name | Notes |
-|---|---|---|
-| 0 | magic | set by firmware on save |
-| 1 | I2C address | used at boot if 0x08-0x77, else 0x54. New address applies after reset |
-| 2 | num steps | 0-20 |
-| 3 | checksum | set by firmware on save (sum of the other 63 bytes) |
-| 4-63 | steps | 20 x 3 bytes |
-
-Each step is 3 bytes:
-- **bytes 0-1:** RGB565 color, little-endian. All LEDs get the same color.
-- **byte 2:** time. Bits 0-6 are the duration in 20ms ticks (max 2.54s).
-  - bit 7 = 0: fade from the current color to this one over the duration
-  - bit 7 = 1 (snap): jump to the color and hold it for the duration
-
-Behavior:
-- **Boot:** the pattern plays at boot and loops.
-- **Fallback:** an erased or corrupt page falls back to a built-in red/green/blue fade.
-- **Stopping:** writing any LED register stops playback. Send stop (0x11) first to avoid one stray
-  frame overwriting your colors.
-- **Flash wear:** about 10K erase cycles, so save only when something changed.
-- **Size:** firmware must stay below `0x3FC0` (this stage is ~3.3K), and a full chip erase wipes
-  the page.
-
-## 1K pattern mode (stage 90)
-
-Like stage 80, but the pattern area is the last 1K of flash (`0x08003C00`-`0x08003FFF`, 16 x
-64-byte pages).
-- **Playback** reads steps straight from flash.
-- **Editing** goes through a 64-byte window, one page at a time, so it fits the 1-byte I2C
-  register address.
-- **Build guard:** the Makefile's `check_size` fails the build if the firmware would grow into
-  0x3C00.
-
-| Addr | R/W | Name | Notes |
-|---|---|---|---|
-| 0x06 | W | `COMMAND` | 0x01 show, 0x10 play, 0x11 stop, 0x12 save, 0x13 load, 0xA5 reset |
-| 0x38 | R | `PATT_STATUS` | bit0 = playing |
-| 0x39 | R | `PATT_POS` | last step started |
-| 0x3A | R | `PATT_LEN` | steps in the pattern being played |
-| 0x3B | R/W | `PAGE_SEL` | 0-15. Writing it loads that flash page into `WINDOW` |
-| 0x40-0x7F | R/W | `WINDOW` | RAM copy of the selected page |
-
-To change the pattern, do this for each page:
-1. Write `PAGE_SEL` in its own transaction.
-2. Write `WINDOW`.
-3. Send save (0x12), then read `WINDOW` back to verify.
-
-Save page 0 last, since it holds the header. Load (0x13) throws away unsaved edits.
-
-Pattern area layout:
-- **Header:** the first 4 bytes of page 0.
-  - magic, set by firmware
-  - I2C address
-  - number of steps (0-255)
-  - checksum, set by firmware (magic + addr + steps)
-- **Steps:** follow the header, 4 bytes each, 255 max. Page 0 holds steps 0-14, and each page after
-  that holds 16 steps.
-
-Each step is 4 bytes:
-- **bytes 0-1:** RGB565 color, little-endian
-- **byte 2:** LED
-  - bits 0-3: 0 = all LEDs, 1-8 = that LED
-  - bit 7 = with-next: start the next step right away too, so fades overlap
-- **byte 3:** time
-  - bits 0-6: duration in 20ms ticks (max 2.54s)
-  - bit 7 = 0: fade to the color over the duration, then go to the next step
-  - bit 7 = 1 (snap): jump to the color and hold it for the duration
-
-Behavior:
-- **Fades:** each LED fades on its own, so a with-next step lets several LEDs fade at once.
-- **Fallback:** if the header is erased or invalid, the built-in red/green/blue fade plays and the
-  address is 0x54.
-- **Same as 80:** the pattern plays at boot, LED writes stop playback, and a new address applies
-  after reset.
-- **Unused space:** erased step slots read as 0xFF (white, no LED). Keep `num steps` within what
-  you've written.
 
 ## Seesaw mode (stage 70)
 

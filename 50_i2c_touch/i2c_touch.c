@@ -22,7 +22,7 @@
 #include "touch.h"
 
 #define WHO_AM_I_VAL (0xC3)
-#define FW_VERSION_VAL (0x05)
+#define FW_VERSION_VAL (50)
 
 enum {
     REG_WHO_AM_I       = 0x00,
