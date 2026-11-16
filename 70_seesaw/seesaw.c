@@ -18,11 +18,7 @@
 
 #define NUM_PADS (4)
 #define TOUCH_WHEEL (1)
-#if BOARD_TARGET  // set in Makefile, "make BOARD_TARGET=1" for SOP-16/QFN-20
-#define TOUCH_PINS { {GPIOA,2,0}, {GPIOA,1,1}, {GPIOC,4,2}, {GPIOD,4,7} }
-#else  // dev board: PA1/PA2 are crystal pins, so skip them
 #define TOUCH_PINS { {GPIOC,4,2}, {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7} }
-#endif
 #include "touch.h"
 
 #define WS2812DMA_IMPLEMENTATION

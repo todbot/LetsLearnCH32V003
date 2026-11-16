@@ -161,16 +161,6 @@ make monitor   # view printf output (over SWIO)
 make clangd    # make compile_commands.json for editors (needs bear)
 ```
 
-Stages 40-70 build for the dev board by default. For a SOP-16 or QFN-20
-target board:
-
-```sh
-make clean && make BOARD_TARGET=1 flash
-```
-
-The `make clean` is needed because make doesn't rebuild when only a flag
-changes.
-
 If the programmer can't do `make monitor`, switch the stage's `funconfig.h`
 to UART printf (TX on PD5, 115200).
 
@@ -181,8 +171,7 @@ reader runs from RAM).
 ## Pins
 
 Pins are set by `#define`s at the top of each `.c` file. Defaults are for a
-CH32V003F4P6 (TSSOP-20) dev board. `BOARD_TARGET=1` switches stages 40-70
-to the target board pins (see Target boards below).
+CH32V003F4P6 (TSSOP-20) dev board, and they work unchanged on a QFN-20 board (see below).
 
 ### Pins per stage (dev board)
 
@@ -229,8 +218,7 @@ What each pin does:
 Other pins:
 - **PD5:** UART TX, only if `funconfig.h` is switched to UART printf
 - **PD7:** NRST by default (option bytes), unused
-- **PA1/PA2:** crystal pins on some boards. This dev board has no crystal (the V003 runs on
-  its internal RC), so they're free
+- **PA1/PA2:** free. These boards have no crystal, the V003 runs on its internal RC
 - **PD1:** the dev board's LED is on it, wired to VDD, so it lights while SWIO is low
 - **PC3 (except 80), PC5, PD0:** free
 
@@ -251,61 +239,41 @@ Other pins:
                         +----------+
 ```
 
-### Target boards (SOP-16 and QFN-20)
+### QFN-20 boards
 
-The targets are the CH32V003A4M6 (SOP-16) and the CH32V003F4U6 (QFN-20).
-The QFN-20 has the same 18 I/O pins as the TSSOP-20 dev board. The SOP-16
-has no PD0, PD2, PD3 or PC5. So the target pad map uses only pins both
-packages have: PA2, PA1, PC4, PD4. One `BOARD_TARGET=1` build then runs on
-either package.
+The CH32V003F4U6 (QFN-20) has the same 18 I/O pins as the TSSOP-20 dev board, so the same
+builds run on it. Like the dev board, QFN-20 boards have no crystal.
 
-| Function | Pin | SOP-16 # | QFN-20 # |
-|---|---|---|---|
-| I2C SDA | PC1 | 1 | 8 |
-| I2C SCL | PC2 | 2 | 9 |
-| WS2812 data | PC6 | 5 | 13 |
-| INT out | PC7 | 6 | 14 |
-| SWIO | PD1 | 7 | 15 |
-| pad0 (A0) | PA2 | 13 | 3 |
-| pad1 (A1) | PA1 | 12 | 2 |
-| pad2 (A2) | PC4 | 4 | 11 |
-| pad3 (A7) | PD4 | 8 | 18 |
-| UART TX (opt) | PD5 | 9 | 19 |
-| NRST | PD7 | 11 | 1 |
-| VDD | | 15 | 6 |
-| GND | | 14 | 4, exposed pad |
+| Function | Pin | QFN-20 # |
+|---|---|---|
+| I2C SDA | PC1 | 8 |
+| I2C SCL | PC2 | 9 |
+| WS2812 data | PC6 | 13 |
+| INT out | PC7 | 14 |
+| SWIO | PD1 | 15 |
+| pad0 (A2) | PC4 | 11 |
+| pad1 (A3) | PD2 | 16 |
+| pad2 (A4) | PD3 | 17 |
+| pad3 (A7) | PD4 | 18 |
+| UART TX (opt) | PD5 | 19 |
+| NRST | PD7 | 1 |
+| VDD | | 6 |
+| GND | | 4, exposed pad |
 
-- Other ADC pins on both packages: PD5 (A5) and PD6 (A6). Using PD5 for
-  touch means giving up the UART printf fallback.
-- The QFN-20's exposed pad is VSS, so tie it to GND.
+- The exposed pad is VSS, so tie it to GND.
 
-SOP-16 (CH32V003A4M6):
+QFN-20 (CH32V003F4U6), top view, p0-p3 = pad0-3:
 
 ```
-                        +----\/----+
-     I2C SDA   PC1   1 -|          |- 16  PC0
-     I2C SCL   PC2   2 -|          |- 15  VDD  3.3V
-               PC3   3 -|          |- 14  VSS  GND
-   pad2  A2    PC4   4 -|          |- 13  PA2  A0  pad0
-  WS2812 dat   PC6   5 -|          |- 12  PA1  A1  pad1
-     INT out   PC7   6 -|          |- 11  PD7  NRST
-  programmer   PD1   7 -|          |- 10  PD6  A6  (free)
-   pad3  A7    PD4   8 -|          |-  9  PD5  A5  (UART TX)
-                        +----------+
-```
-
-QFN-20 (CH32V003F4U6), top view:
-
-```
-                  (TX) pad3
+                  TX  p3  p2  p1
               PD6 PD5 PD4 PD3 PD2
                20  19  18  17  16
              +-------------------+
  NRST  PD7  1|*                  |15  PD1  SWIO
- pad1  PA1  2|                   |14  PC7  INT out
- pad0  PA2  3|   exposed pad     |13  PC6  WS2812 data
+       PA1  2|                   |14  PC7  INT out
+       PA2  3|   exposed pad     |13  PC6  WS2812 data
   GND  VSS  4|     = VSS         |12  PC5
-       PD0  5|                   |11  PC4  pad2
+       PD0  5|                   |11  PC4  pad0
              +-------------------+
                 6   7   8   9  10
               VDD PC0 PC1 PC2 PC3
@@ -315,8 +283,8 @@ QFN-20 (CH32V003F4U6), top view:
 - Touch pins must have an ADC channel. A0-A7 are channel numbers, not
   port A: A0=PA2 A1=PA1 A2=PC4 A3=PD2 A4=PD3 A5=PD5 A6=PD6 A7=PD4
 - `TOUCH_PINS` entries are `{port, pin, adc_chan}`, so PD4 is `{GPIOD,4,7}`
-- PA1/PA2 are crystal pins on most dev boards, so the dev board map skips
-  them
+- Other ADC pins: PA2 (A0), PA1 (A1), PD5 (A5), PD6 (A6). Using PD5 for touch means giving up
+  the UART printf fallback.
 - `NUM_PADS` (3 or 4) and `TOUCH_WHEEL` (wheel vs buttons) are compile-time
 
 ### 3.3V and 5V hosts
