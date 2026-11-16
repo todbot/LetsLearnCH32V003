@@ -1,4 +1,4 @@
-# CH32V003_Learning
+# LetsLearnCH32V003
 
 Learning the CH32V003 in small steps, in plain C on [ch32fun](https://github.com/cnlohr/ch32fun):
 register-level, no WCH HAL. Each stage is a standalone ch32fun project that adds one concept.
@@ -7,43 +7,42 @@ Later stages copy code forward on purpose, so each can be read alone.
 ## Assumptions
 
 This is for those experienced with programming Arduino or C on small MCUs.
-The CH32V003 has 16 kB and 2 kB RAM, very similar to the original Arduino, 
+The CH32V003 has 16 kB flash and 2 kB RAM, very similar to the original Arduino, 
 kind of like ATtinys today. The CH32V003 is more capable than the ATmega168 
 in the original Arduino.
 The device doesn't support USB and needs an external programmer.
 
 These examples are all based on [cnlohr's ch32fun](https://github.com/cnlohr/ch32fun)
-open-source miniaml C-based HAL for the CH32 chips. 
+open-source minimal C-based HAL for the CH32 chips. 
 Many of these examples are just reworked examples in ch32fun. 
 
 ## Software setup
  
-For details for your OS, see the [ch32fun wiki on installation](https://github.com/cnlohr/ch32fun/wiki/Installation). On my Mac, I had most of these tools already installed, but 
-quickly:
+For details for your OS, see the
+[ch32fun wiki on installation](https://github.com/cnlohr/ch32fun/wiki/Installation).
+On my Mac, I had most of these tools already installed, but quickly:
 
 ```sh
-# risc-v tools
 brew trust riscv-software-src/riscv
 brew tap riscv-software-src/riscv
 brew install riscv-tools
-# libusb for minichlink
-brew install pkg-config libusb
+brew install pkg-config libusb   # libusb for minichlink
 ```
 
 Get this repo and build the `minichlink` programmer app:
 ```
 # get ch32fun 
-git clone https://github.com/todbot/CH32V003_Learning
-cd CH32V003_Learning
+git clone https://github.com/todbot/LetsLearnCH32V003
+cd LetsLearnCH32V003
 git submodule update --init
-cd ch32fun/minchlink
+cd ch32fun/minichlink
 make
 ```
 
 ## Hardware dev board 
 
 For these examples, this [common CH32V003 dev board](https://link.amazon/B0gMU10gb)
-will be used.  It contains the CH32V003F4P6 (SOIC-16) version of the chip.
+will be used.  It contains the CH32V003F4P6 (TSSOP-20) version of the chip.
 These dev boards can be had for cheap: [5 for $10 on Amazon](https://link.amazon/B0gMU10gb).
 
 <img src="./docs/CH32V003F4P6-devboard-top.jpg" width="300">
@@ -64,7 +63,11 @@ Steps:
 ```sh
 git clone https://github.com/cnlohr/esp32s2-cookbook
 cd esp32s2-cookbook/ch32v003programmer
-esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 4MB 0x1000 build/bootloader/bootloader.bin 0x10000 build/usb_sandbox.bin 0x8000 build/partition_table/partition-table.bin
+esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset \
+  write_flash --flash_mode dio --flash_freq 80m --flash_size 4MB \
+  0x1000 build/bootloader/bootloader.bin \
+  0x10000 build/usb_sandbox.bin \
+  0x8000 build/partition_table/partition-table.bin
 ```
 
 
@@ -72,15 +75,15 @@ esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset w
 
 | Stage | What it adds |
 |---|---|
-| `10_blink` | toolchain + programmer check: LED blink, printf over SWIO |
-| `15_blink_input` | 10 + keys typed in `make monitor` set the blink time |
-| `20_ws2812` | WS2812s via SPI1+DMA on PC6, color-order check, rainbow |
-| `30_i2c_leds` | I2C target (0x54), host sets LED colors via registers |
-| `40_touch_printf` | ADC captouch, filtering, baseline, wheel pos, printf |
-| `45_touch_ws2812` | 40 + 20: LED n lights while pad n is touched |
-| `50_i2c_touch` | I2C target reporting touch status/pos/raw, INT pin |
-| `60_i2c_touch_leds` | complete custom-register device + Python driver |
-| `70_seesaw` | Adafruit seesaw compatible (STATUS, NEOPIXEL, TOUCH) |
+| [`10_blink`](10_blink/) | toolchain + programmer check: LED blink, printf over SWIO |
+| [`15_blink_input`](15_blink_input/) | 10 + keys typed in `make monitor` set the blink time |
+| [`20_ws2812`](20_ws2812/) | WS2812s via SPI1+DMA on PC6, color-order check, rainbow |
+| [`30_i2c_leds`](30_i2c_leds/) | I2C target (0x54), host sets LED colors via registers |
+| [`40_touch_printf`](40_touch_printf/) | ADC captouch, filtering, baseline, wheel pos, printf |
+| [`45_touch_ws2812`](45_touch_ws2812/) | 40 + 20: LED n lights while pad n is touched |
+| [`50_i2c_touch`](50_i2c_touch/) | I2C target reporting touch status/pos/raw, INT pin |
+| [`60_i2c_touch_leds`](60_i2c_touch_leds/) | complete custom-register device + Python driver |
+| [`70_seesaw`](70_seesaw/) | Adafruit seesaw compatible (STATUS, NEOPIXEL, TOUCH) |
 
 Each I2C stage has a CircuitPython test in `host/`.
 
