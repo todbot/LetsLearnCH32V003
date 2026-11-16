@@ -1,8 +1,7 @@
 # LetsLearnCH32V003
 
-Learning the CH32V003 in small steps, in plain C on [ch32fun](https://github.com/cnlohr/ch32fun):
-register-level, no WCH HAL. Each stage is a standalone ch32fun project that adds one concept.
-Later stages copy code forward on purpose, so each can be read alone. 
+Let's learn how to program the "10 cent" CH32V003 chip in plain C 
+on [ch32fun](https://github.com/cnlohr/ch32fun), as a series of steps.
 
 ## Assumptions
 
@@ -16,30 +15,7 @@ These examples are all based on [cnlohr's ch32fun](https://github.com/cnlohr/ch3
 open-source minimal C-based HAL for the CH32 chips. 
 Many of these examples are just reworked examples in ch32fun. 
 
-## Software setup
- 
-For details for your OS, see the
-[ch32fun wiki on installation](https://github.com/cnlohr/ch32fun/wiki/Installation).
-On my Mac, I had most of these tools already installed, but quickly:
-
-```sh
-brew trust riscv-software-src/riscv
-brew tap riscv-software-src/riscv
-brew install riscv-tools
-brew install pkg-config libusb   # libusb for minichlink
-```
-
-Get this repo and build the `minichlink` programmer app:
-```
-# get ch32fun 
-git clone https://github.com/todbot/LetsLearnCH32V003
-cd LetsLearnCH32V003
-git submodule update --init
-cd ch32fun/minichlink
-make
-```
-
-## Hardware dev board 
+## Hardware setup
 
 For these examples, this [common CH32V003 dev board](https://link.amazon/B0gMU10gb)
 will be used.  It contains the CH32V003F4P6 (TSSOP-20) version of the chip.
@@ -49,7 +25,7 @@ These dev boards can be had for cheap: [5 for $10 on Amazon](https://link.amazon
 <img src="./docs/CH32V003F4P6-devboard-bot.jpg" width="300">
 
 
-## Hardware programmer
+## Hardware programmer setup
 
 The official programmer is a "WCH Link-E". This can be had for about $5 on Aliexpress.
 I didn't want to wait. Thankfully you can make a CH32 programmer from another 
@@ -70,8 +46,44 @@ esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset \
   0x8000 build/partition_table/partition-table.bin
 ```
 
+The solder three jumpers to the ESP32-S2 board: Gnd, 3V3, SWIO.
+I like the [Lolin S2Mini](https://link.amazon/B0aM3kL9F). The result looks like:
+
+[img here to be added]
+
+## Breadboard setup
+
+A number of peripherals will be attached to the CH32V003 board.  Here's how
+my breadboard is set up. Exact [pins used](#pins) described below.
+
+
+## Software setup
+ 
+For details for your OS, see the [ch32fun wiki on installation](https://github.com/cnlohr/ch32fun/wiki/Installation). On a Mac, quickly:
+
+```sh
+brew trust riscv-software-src/riscv
+brew tap riscv-software-src/riscv
+brew install riscv-tools
+brew install pkg-config libusb   # libusb for minichlink
+```
+
+Get this repo and build the `minichlink` programmer app:
+
+```sh
+git clone https://github.com/todbot/LetsLearnCH32V003
+cd LetsLearnCH32V003
+git submodule update --init
+cd ch32fun/minichlink
+make
+```
+
+
 
 ## Examples
+
+Each example is self-contained and builds on its own. Most of these will
+be doing more complicated tasks than the standard button reading. 
 
 | Stage | What it adds |
 |---|---|
