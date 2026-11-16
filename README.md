@@ -19,11 +19,21 @@ Many of these examples are just reworked examples in ch32fun.
 
 For these examples, this [common CH32V003 dev board](https://link.amazon/B0gMU10gb)
 will be used.  It contains the CH32V003F4P6 (TSSOP-20) version of the chip.
-These dev boards can be had for cheap: [5 for $10 on Amazon](https://link.amazon/B0gMU10gb).
+The dev boards are cheap: [5 for $10 on Amazon](https://link.amazon/B0gMU10gb).
+There's very litle documenation for this specific board. This [Zephyr page](https://docs.zephyrproject.org/latest/boards/wch/ch32v003f4p6_dev_board/doc/)
+is the best I've found.  The button is connected to PC0 and VDD.
+The LED is connected to PD1 via a resistor to Gnd. 
+PD1 is the SWIO programming line, thus not usable as a status LED, but lights
+when programming or monitoring.
 
 <img src="./docs/CH32V003F4P6-devboard-top.jpg" width="300">
 <img src="./docs/CH32V003F4P6-devboard-bot.jpg" width="300">
 
+For use in a breadboard, I like to solder the header pins on and put a 3-pin 
+female header for the programming pins (which can also provide power to the board),
+like this:
+
+<img src="./docs/CH32V003F4P6_devboard_soldered.jpg" width="400">
 
 ## Hardware programmer setup
 
@@ -88,6 +98,7 @@ be doing more complicated tasks than the standard button reading.
 | Stage | What it adds |
 |---|---|
 | [`10_blink`](10_blink/) | toolchain + programmer check: LED blink, printf over SWIO |
+| [`12_button`](12_button/) | read the board's button (PC0), toggle the LED on each press |
 | [`15_blink_input`](15_blink_input/) | 10 + keys typed in `make monitor` set the blink time |
 | [`20_ws2812`](20_ws2812/) | WS2812s via SPI1+DMA on PC6, color-order check, rainbow |
 | [`30_i2c_leds`](30_i2c_leds/) | I2C target (0x54), host sets LED colors via registers |
@@ -96,19 +107,19 @@ be doing more complicated tasks than the standard button reading.
 | [`50_i2c_touch`](50_i2c_touch/) | I2C target reporting touch status/pos/raw, INT pin |
 | [`60_i2c_touch_leds`](60_i2c_touch_leds/) | complete custom-register device + Python driver |
 | [`70_seesaw`](70_seesaw/) | Adafruit seesaw compatible (STATUS, NEOPIXEL, TOUCH) |
+| [`80_oled`](80_oled/) | 128x32 SSD1306 OLED on bit-banged I2C: text, big counter, bar |
 
 Each I2C stage has a CircuitPython test in `host/`.
 
 ## Bringing up each stage
 
-Everything compiles. Stages 10, 15, 20, 40 and 45 are verified on hardware, the rest are not
-tested yet.
-Check each stage before moving to the next:
+These stages are meant to build on each other. Check each stage before moving to the next.
 
 1. **10_blink**
-   - LED on PC0 blinks
+   - LED on PD6 blinks
    - `make monitor` shows `blink N`
    - if not, switch to UART printf in `funconfig.h`
+   - **12_button:** each press toggles the LED and prints one `press` and one `release`
    - **15_blink_input:** keys 1-9,0 set 10-1000 ms, other keys a random time
 2. **20_ws2812**
    - boot shows all red, then green, then blue (checks `WSGRB` order)
@@ -134,15 +145,12 @@ Check each stage before moving to the next:
    - stock `adafruit_seesaw` connects
    - `touch_read(4..7)` tracks the pads
    - NeoPixels light
+8. **80_oled**
+   - OLED shows "80_oled", a counting number and a bar sweeping along the bottom
+   - `make monitor` shows the refresh time once
+   - if it prints `no OLED`, check wiring and that the module is at 0x3C
 
-## Setup
-
-- ch32fun is a git submodule: `git clone --recursive`, or `git submodule update --init` after
-  cloning. Makefiles use `CH32FUN?=../ch32fun/ch32fun`, override with
-  `make CH32FUN=/path/to/ch32fun/ch32fun`
-- RISC-V GCC: Homebrew `riscv64-unknown-elf-gcc` (ch32fun.mk finds it)
-- minichlink: built from the submodule on the first `make flash` (needs `brew install libusb`)
-- Programmer: WCH-LinkE or similar, wired GND, 3V3, SWIO (PD1)
+## Compiling and running
 
 In a stage dir:
 
@@ -176,26 +184,37 @@ Pins are set by `#define`s at the top of each `.c` file. Defaults are for a
 CH32V003F4P6 (TSSOP-20) dev board. `BOARD_TARGET=1` switches stages 40-70
 to the target board pins (see Target boards below).
 
-### Pins used per stage (dev board)
+### Pins per stage (dev board)
 
-| Pin | 10 | 15 | 20 | 30 | 40 | 45 | 50 | 60 | 70 |
-|---|---|---|---|---|---|---|---|---|---|
-| PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
-| PC0 | LED | LED | | | | | | | |
-| PC1 | | | | SDA | | | SDA | SDA | SDA |
-| PC2 | | | | SCL | | | SCL | SCL | SCL |
-| PC4 | | | | | pad0 | pad0 | pad0 | pad0 | pad0 |
-| PC6 | | | LEDs | LEDs | | LEDs | | LEDs | LEDs |
-| PC7 | | | | | | | INT | INT | |
-| PD2 | | | | | pad1 | pad1 | pad1 | pad1 | pad1 |
-| PD3 | | | | | pad2 | pad2 | pad2 | pad2 | pad2 |
-| PD4 | | | | | pad3 | pad3 | pad3 | pad3 | pad3 |
+| Pin | 10 | 12 | 15 | 20 | 30 | 40 | 45 | 50 | 60 | 70 | 80 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| PA1 | | | | | | | | | | | |
+| PA2 | | | | | | | | | | | |
+| PC0 | | btn | | | | | | | | | |
+| PC1 | | | | | SDA | | | SDA | SDA | SDA | |
+| PC2 | | | | | SCL | | | SCL | SCL | SCL | |
+| PC3 | | | | | | | | | | | oSDA |
+| PC4 | | | | | | pad0 | pad0 | pad0 | pad0 | pad0 | oSCL |
+| PC5 | | | | | | | | | | | |
+| PC6 | | | | LEDs | LEDs | | LEDs | | LEDs | LEDs | |
+| PC7 | | | | | | | | INT | INT | | |
+| PD0 | | | | | | | | | | | |
+| PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
+| PD2 | | | | | | pad1 | pad1 | pad1 | pad1 | pad1 | |
+| PD3 | | | | | | pad2 | pad2 | pad2 | pad2 | pad2 | |
+| PD4 | | | | | | pad3 | pad3 | pad3 | pad3 | pad3 | |
+| PD5 | | | | | | | | | | | |
+| PD6 | LED | LED | LED | | | | | | | | |
+| PD7 | | | | | | | | | | | |
 
 What each pin does:
 - **SWIO (PD1):** programming, and debug printf (`make monitor`), in every
   stage. Only GND, 3V3 and SWIO go to the programmer.
-- **LED (PC0, stage 10):** push-pull output. Wire it through 330 ohm to an
+- **LED (PD6, stages 10-15):** push-pull output. Wire it through 330 ohm to an
   LED and then GND.
+- **btn (PC0, stage 12):** the dev board's button connects PC0 to VDD, so it's read as an input
+  with pull-down and a press reads 1. In every stage, never drive PC0 low: a press would short
+  VDD to it.
 - **SDA/SCL (PC1/PC2):** I2C1, alternate-function open-drain. The host
   provides the pull-ups. These pins are 5V tolerant.
 - **LEDs (PC6):** WS2812 data. It is SPI1 MOSI, fixed by the driver. Use a
@@ -204,12 +223,16 @@ What each pin does:
   `NUM_PADS 3`, PD4 is unused.
 - **INT (PC7):** open-drain output, active low. It's low while
   `TOUCH_EVENTS != 0`.
+- **oSDA/oSCL (PC3/PC4):** bit-banged I2C to the OLED, kept off I2C1 so I2C1 can be a
+  peripheral. It drives high push-pull, so the OLED must be the only device on these pins.
 
 Other pins:
 - **PD5:** UART TX, only if `funconfig.h` is switched to UART printf
 - **PD7:** NRST by default (option bytes), unused
-- **PA1/PA2:** crystal pins on most dev boards, unused
-- **PC0 (after stage 10), PC3, PD0, PD6, PC5:** free
+- **PA1/PA2:** crystal pins on some boards. This dev board has no crystal (the V003 runs on
+  its internal RC), so they're free
+- **PD1:** the dev board's LED is on it, wired to VDD, so it lights while SWIO is low
+- **PC3 (except 80), PC5, PD0:** free
 
 ### Stage 60 on the dev board (CH32V003F4P6, TSSOP-20)
 
@@ -217,14 +240,14 @@ Other pins:
                         +----\/----+
      pad3  A7  PD4   1 -|          |- 20  PD3  A4  pad2
    (UART TX)   PD5   2 -|          |- 19  PD2  A3  pad1
-               PD6   3 -|          |- 18  PD1  SWIO -> programmer
+   (10: LED)   PD6   3 -|          |- 18  PD1  SWIO -> programmer
        NRST    PD7   4 -|          |- 17  PC7  INT out (active low)
-   (crystal)   PA1   5 -|          |- 16  PC6  WS2812 data (SPI1 MOSI)
-   (crystal)   PA2   6 -|          |- 15  PC5
+               PA1   5 -|          |- 16  PC6  WS2812 data (SPI1 MOSI)
+               PA2   6 -|          |- 15  PC5
         GND    VSS   7 -|          |- 14  PC4  A2  pad0
                PD0   8 -|          |- 13  PC3
        3.3V    VDD   9 -|          |- 12  PC2  I2C SCL
-   (10: LED)   PC0  10 -|          |- 11  PC1  I2C SDA
+    (button)   PC0  10 -|          |- 11  PC1  I2C SDA
                         +----------+
 ```
 

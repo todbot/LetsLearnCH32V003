@@ -7,7 +7,7 @@
 #include "ch32fun.h"
 #include <stdio.h>
 
-#define LED_PIN PC0
+#define LED_PIN PD6
 #define BLINK_MIN_MS (10)
 #define BLINK_MAX_MS (1000)
 

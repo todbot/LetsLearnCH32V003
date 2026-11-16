@@ -6,7 +6,7 @@
 #include "ch32fun.h"
 #include <stdio.h>
 
-#define LED_PIN PC0
+#define LED_PIN PD6
 
 int main()
 {
