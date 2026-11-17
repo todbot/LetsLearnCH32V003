@@ -248,7 +248,7 @@ Other pins:
                         +----------+
 ```
 
-### Chip details
+### Pin usage notes
 
 - Touch pins must have an ADC channel. A0-A7 are channel numbers, not
   port A: A0=PA2 A1=PA1 A2=PC4 A3=PD2 A4=PD3 A5=PD5 A6=PD6 A7=PD4
