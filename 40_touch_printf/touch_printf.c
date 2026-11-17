@@ -8,10 +8,18 @@
 #include "ch32fun.h"
 #include <stdio.h>
 
-#define NUM_PADS (4)
-#define TOUCH_WHEEL (0)
+// for 3-pad wheel
+#define NUM_PADS (3)
+#define TOUCH_WHEEL (1)
 // {port, pin, adc_chan}
-#define TOUCH_PINS { {GPIOC,4,2}, {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7} }
+#define TOUCH_PINS { {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7} }
+
+// for 4-buttons buttons
+/* #define NUM_PADS (4) */
+/* #define TOUCH_WHEEL (0) */
+/* // {port, pin, adc_chan} */
+/* #define TOUCH_PINS { {GPIOC,4,2}, {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7} } */
+
 #include "touch.h"
 
 // ch32fun's printf has no %b. pad 0 first, to line up with the columns

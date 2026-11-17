@@ -25,7 +25,8 @@ There's very little documentation for this specific board. This
 is the best I've found.  
 The interesting pins: button is across PC0 and VDD, LED on PD1 
 (PD1 is SWIO program, not usable as GPIO, but lights while programming), 
-TX / RX on PD5 / PD6 (just labeling, no circuitry)
+TX / RX on PD5 / PD6 (just labeling, no circuitry). 
+The USB connector is just for power, no data lines connect to the chip.
 
 <img src="./docs/CH32V003F4P6-devboard-both.jpg" width="500">
 
@@ -119,7 +120,7 @@ Each I2C stage has a CircuitPython test in `host/`.
 
 ## Running each sketch stage
 
-These stages are meant to build on each other.  Each one you build the same way:
+These stages are meant to build on each other.  Each one you compile & run the same way:
 
 ```sh
 cd 10_blink    # pick a sketch
