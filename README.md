@@ -26,8 +26,8 @@ The interesting pins: button is across PC0 and VDD, LED on PD1
 (PD1 is SWIO program, not usable as GPIO, but lights while programming), 
 TX / RX on PD5 / PD6 (just labeling, no circuitry)
 
-<img src="./docs/CH32V003F4P6-devboard-top.jpg" width="300">
-<img src="./docs/CH32V003F4P6-devboard-bot.jpg" width="300">
+<img src="./docs/CH32V003F4P6-devboard-top.jpg" width="250">
+<img src="./docs/CH32V003F4P6-devboard-bot.jpg" width="250">
 
 For use in a breadboard, I like to solder the header pins on and put a 3-pin 
 female header instead of male pins for the programming pins. The programming
