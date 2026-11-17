@@ -393,3 +393,15 @@ The lib only accepts certain chip IDs, and Crickit's pinmap allows
 - **TOUCH_THRESH_DEFAULT** (500, in `touch.h`) comes from buttons4x0 pads on the dev board:
   touches read ~3000-3600 above baseline, idle noise peaks around ±230 raw. Retune with
   `40_touch_printf` for other pads or overlays.
+
+
+## Links
+
+- https://www.wch-ic.com/products/CH32V003.html - CH32V003 homepage
+- https://cw2.github.io/ch32v003/ - list of dev boards
+- https://github.com/wagiminator/Development-Boards/tree/main/CH32V003F4P6_DevBoard (not the board we're using, but similar)
+- https://github.com/lemio/esp-wasm/tree/main/toolchain/examples/funprog/examples/CH32V003_Programmer - ESP32-S3 programmer in Arduino 
+- https://lemio.github.io/esp-wasm/ - browser-based tool w/ CH32 examples
+- https://github.com/eric15342335/inspirematrix-buttons - example projects
+- https://siliconjunction.top/2026/01/30/getting-started-with-the-ch32v003/ - getting started
+
