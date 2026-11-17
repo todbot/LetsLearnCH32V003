@@ -66,7 +66,9 @@ You may want to do a female header here and male on the board.
 ## Breadboard setup
 
 A number of peripherals will be attached to the CH32V003 board.  Here's how
-my breadboard is set up. Exact [pins used](#pins) described below.
+my breadboard is set up for most of the sketches. Exact [pins used](#pins) described below.
+
+<img src="./docs/todbot-breadboard0.jpg" width="500">
 
 
 ## Software setup
@@ -113,9 +115,15 @@ be doing more complicated tasks than the standard button reading.
 
 Each I2C stage has a CircuitPython test in `host/`.
 
-## Bringing up each stage
+## Running each sketch stage
 
-These stages are meant to build on each other. Check each stage before moving to the next.
+These stages are meant to build on each other.  Each one you build the same way:
+
+```sh
+cd 10_blink    # pick a sketch
+make           # compiles and programs
+make monitor   # to watch printfs()
+```
 
 1. **10_blink**
    - LED on PD6 blinks
@@ -152,7 +160,7 @@ These stages are meant to build on each other. Check each stage before moving to
    - `make monitor` shows the refresh time once
    - if it prints `no OLED`, check wiring and that the module is at 0x3C
 
-## Compiling and running
+## Compiling tips
 
 In a stage dir:
 
@@ -173,7 +181,7 @@ reader runs from RAM).
 ## Pins
 
 Pins are set by `#define`s at the top of each `.c` file. Defaults are for a
-CH32V003F4P6 (TSSOP-20) dev board, and they work unchanged on a QFN-20 board (see below).
+CH32V003F4P6 (TSSOP-20) dev board.
 
 ### Pins per stage (dev board)
 
@@ -241,46 +249,7 @@ Other pins:
                         +----------+
 ```
 
-### QFN-20 boards
-
-The CH32V003F4U6 (QFN-20) has the same 18 I/O pins as the TSSOP-20 dev board, so the same
-builds run on it. Like the dev board, QFN-20 boards have no crystal.
-
-| Function | Pin | QFN-20 # |
-|---|---|---|
-| I2C SDA | PC1 | 8 |
-| I2C SCL | PC2 | 9 |
-| WS2812 data | PC6 | 13 |
-| INT out | PC7 | 14 |
-| SWIO | PD1 | 15 |
-| pad0 (A2) | PC4 | 11 |
-| pad1 (A3) | PD2 | 16 |
-| pad2 (A4) | PD3 | 17 |
-| pad3 (A7) | PD4 | 18 |
-| UART TX (opt) | PD5 | 19 |
-| NRST | PD7 | 1 |
-| VDD | | 6 |
-| GND | | 4, exposed pad |
-
-- The exposed pad is VSS, so tie it to GND.
-
-QFN-20 (CH32V003F4U6), top view, p0-p3 = pad0-3:
-
-```
-                  TX  p3  p2  p1
-              PD6 PD5 PD4 PD3 PD2
-               20  19  18  17  16
-             +-------------------+
- NRST  PD7  1|*                  |15  PD1  SWIO
-       PA1  2|                   |14  PC7  INT out
-       PA2  3|   exposed pad     |13  PC6  WS2812 data
-  GND  VSS  4|     = VSS         |12  PC5
-       PD0  5|                   |11  PC4  pad0
-             +-------------------+
-                6   7   8   9  10
-              VDD PC0 PC1 PC2 PC3
-                      SDA SCL
-```
+### Chip details
 
 - Touch pins must have an ADC channel. A0-A7 are channel numbers, not
   port A: A0=PA2 A1=PA1 A2=PC4 A3=PD2 A4=PD3 A5=PD5 A6=PD6 A7=PD4
