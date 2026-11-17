@@ -20,13 +20,14 @@ Many of these examples are just reworked examples in ch32fun.
 For these examples, this [common CH32V003 dev board](https://link.amazon/B0gMU10gb)
 will be used.  It contains the CH32V003F4P6 (TSSOP-20) version of the chip.
 The dev boards are cheap: [5 for $10 on Amazon](https://link.amazon/B0gMU10gb).
-There's very litle documenation for this specific board. This [Zephyr page](https://docs.zephyrproject.org/latest/boards/wch/ch32v003f4p6_dev_board/doc/)
+There's very little documentation for this specific board. This
+[Zephyr page](https://docs.zephyrproject.org/latest/boards/wch/ch32v003f4p6_dev_board/doc/)
 is the best I've found.  
 The interesting pins: button is across PC0 and VDD, LED on PD1 
 (PD1 is SWIO program, not usable as GPIO, but lights while programming), 
 TX / RX on PD5 / PD6 (just labeling, no circuitry)
 
-<img src="./docs/CH32V003F4P6-devboard-top.jpg" width="250"><img src="./docs/CH32V003F4P6-devboard-bot.jpg" width="250">
+<img src="./docs/CH32V003F4P6-devboard-both.jpg" width="500">
 
 For use in a breadboard, I like to solder the header pins on and put a 3-pin 
 female header instead of male pins for the programming pins. The programming
@@ -39,11 +40,11 @@ port can also supply power to the board.
 
 The official programmer is a "WCH Link-E". This can be had for about $5 on Aliexpress.
 I didn't want to wait. Thankfully you can make a CH32 programmer from another 
-dev board. I used chlohr's ESP32-S2-based "ch32v003programmer":
+dev board. I used cnlohr's ESP32-S2-based "ch32v003programmer":
 
 Steps:
 - Download https://github.com/cnlohr/esp32s2-cookbook to get "ch32v003programmer" then do:
-- Plug in a ESP32-S2 board, hold BOOT + tap RESET to put into bootloader mode
+- Plug in an ESP32-S2 board, hold BOOT + tap RESET to put into bootloader mode
 - Install ch32v003programmer
 
 ```sh
@@ -56,8 +57,8 @@ esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset \
   0x8000 build/partition_table/partition-table.bin
 ```
 
-The solder three jumpers to the ESP32-S2 board: Gnd, 3V3, IO6 for SWIO.
-I like the [Lolin S2Mini](https://link.amazon/B0aM3kL9F). The result looks like.
+Then solder three jumpers to the ESP32-S2 board: Gnd, 3V3, IO6 for SWIO.
+I like the [Lolin S2Mini](https://link.amazon/B0aM3kL9F). The result looks like:
 You may want to do a female header here and male on the board.
 
 <img src="./docs/ESP32-S2_CH32V003Programmer.jpg" width="400">
@@ -72,7 +73,9 @@ my breadboard is set up for most of the sketches. Exact [pins used](#pins) descr
 
 ## Software setup
  
-For details for your OS, see the [ch32fun wiki on installation](https://github.com/cnlohr/ch32fun/wiki/Installation). On a Mac, quickly:
+For details for your OS, see the
+[ch32fun wiki on installation](https://github.com/cnlohr/ch32fun/wiki/Installation).
+On a Mac, quickly:
 
 ```sh
 brew trust riscv-software-src/riscv
@@ -268,14 +271,6 @@ the touch pins.
   - At VDD = 3.3V the CH32 reads above ~1.7V as high and below ~0.76V as low (Table 3-16).
   - A 5V ATmega328P needs at least 3.5V for a high (0.7 x VCC). It gets that when the pull-ups
     go to 5V.
-- **INT (PC7) is not 5V tolerant.** On a 5V host, don't use `INPUT_PULLUP` on the INT line.
-  Instead do one of:
-  - put a pull-up to the board's VDD and use plain `INPUT` on the host
-  - leave INT unconnected
-- **Use one pull-up voltage per bus.**
-  - Mixing 3.3V pull-ups (on another Qwiic board) with an Arduino's internal 5V ones gives an
-    in-between high, which can be below 3.5V.
-  - It also leaks current into the 3.3V rail.
 - **Power.** The board has no regulator, so connector V+ is VDD.
   - The V003 runs on 2.7-5.5V, so 5V from an Arduino is fine, and it gives the WS2812 better data
     levels.
@@ -399,8 +394,8 @@ The lib only accepts certain chip IDs, and Crickit's pinmap allows
 
 - https://www.wch-ic.com/products/CH32V003.html - CH32V003 homepage
 - https://cw2.github.io/ch32v003/ - list of dev boards
-- https://github.com/wagiminator/Development-Boards/tree/main/CH32V003F4P6_DevBoard (not the board we're using, but similar)
-- https://github.com/lemio/esp-wasm/tree/main/toolchain/examples/funprog/examples/CH32V003_Programmer - ESP32-S3 programmer in Arduino 
+- https://github.com/wagiminator/Development-Boards/tree/main/CH32V003F4P6_DevBoard - not the board we're using, but similar
+- https://github.com/lemio/esp-wasm/tree/main/toolchain/examples/funprog/examples/CH32V003_Programmer - ESP32-S3 programmer in Arduino
 - https://lemio.github.io/esp-wasm/ - browser-based tool w/ CH32 examples
 - https://github.com/eric15342335/inspirematrix-buttons - example projects
 - https://siliconjunction.top/2026/01/30/getting-started-with-the-ch32v003/ - getting started
