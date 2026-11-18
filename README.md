@@ -68,9 +68,12 @@ the below. Use 3 F-F jumper wires to go from the programmer to the dev board.
 
 A number of peripherals will be attached to the CH32V003 board.  Here's how
 my breadboard is set up for most of the sketches. 
-Exact [pins used](#pins) described below.
+Exact [pins used](#pins) described below. 
 
 <img src="./docs/todbot-breadboard0.jpg" width="500">
+
+In the above photo, I also have a Adafruit QTPy RP2040 hooked up via its StemmaQT
+connector to the I2C pins of the dev board.
 
 
 ## Software setup
