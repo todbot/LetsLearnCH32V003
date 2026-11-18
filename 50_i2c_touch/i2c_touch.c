@@ -3,6 +3,7 @@
 //
 // - I2C SDA on PC1, SCL on PC2
 // - INT on PC7, open-drain active-low, asserted while TOUCH_EVENTS != 0
+// - status LED on PD6, set by CONFIG bit3
 // - u16 regs are little-endian
 
 #include "ch32fun.h"
@@ -11,6 +12,7 @@
 
 #define I2C_ADDR (0x54)
 #define INT_PIN PC7
+#define STATUS_LED_PIN PD6
 
 // for 3-pad wheel
 #define NUM_PADS (3)
@@ -44,6 +46,7 @@ enum {
 };
 
 #define CONFIG_INT_ENABLE (1<<0)
+#define CONFIG_STATUS_LED (1<<3)  // lights PD6 LED
 #define CMD_RECALIBRATE (0x02)
 
 volatile uint8_t regs[REG_NUMREGS];
@@ -105,6 +108,7 @@ void update_regs()
     bool int_on = touch_events && (regs[REG_CONFIG] & CONFIG_INT_ENABLE);
     // open-drain: low pulls INT down, high lets it float to host's pull-up
     funDigitalWrite( INT_PIN, int_on ? FUN_LOW : FUN_HIGH );
+    funDigitalWrite( STATUS_LED_PIN, (regs[REG_CONFIG] & CONFIG_STATUS_LED) ? FUN_HIGH : FUN_LOW );
 }
 
 int main()
@@ -121,6 +125,7 @@ int main()
     }
 
     funPinMode( INT_PIN, GPIO_Speed_10MHz | GPIO_CNF_OUT_OD );
+    funPinMode( STATUS_LED_PIN, GPIO_Speed_10MHz | GPIO_CNF_OUT_PP );
     funDigitalWrite( INT_PIN, FUN_HIGH );
 
     // alternate function open-drain: I2C peripheral drives the pins

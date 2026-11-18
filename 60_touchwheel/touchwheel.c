@@ -4,6 +4,7 @@
 // - I2C SDA on PC1, SCL on PC2
 // - LED data on PC6
 // - INT on PC7, open-drain active-low, asserted while TOUCH_EVENTS != 0
+// - status LED on PD6, set by CONFIG bit3
 // - register map in ../README.md, u16 regs are little-endian
 
 #include "ch32fun.h"
@@ -12,6 +13,7 @@
 
 #define I2C_ADDR (0x54)
 #define INT_PIN PC7
+#define STATUS_LED_PIN PD6
 #define NUM_LEDS (8)
 
 // for 3-pad wheel
@@ -57,6 +59,7 @@ enum {
 #define CONFIG_INT_ENABLE (1<<0)
 #define CONFIG_AUTOSHOW   (1<<1)  // show LEDs after any write to LED regs
 #define CONFIG_FEEDBACK   (1<<2)  // firmware lights LED under finger
+#define CONFIG_STATUS_LED (1<<3)  // lights PD6 LED
 #define CMD_SHOW        (0x01)
 #define CMD_RECALIBRATE (0x02)
 #define CMD_RESET       (0xA5)
@@ -132,6 +135,7 @@ void on_i2c_write( uint8_t reg, uint8_t len )
 void update_regs()
 {
     static uint8_t last_bits = 0;
+    static uint8_t last_pos = 0;
     uint8_t bits = touch_bits();
     uint8_t pos = touch_wheel_pos();
 
@@ -152,13 +156,18 @@ void update_regs()
     bool int_on = touch_events && (regs[REG_CONFIG] & CONFIG_INT_ENABLE);
     // open-drain: low pulls INT down, high lets it float to host's pull-up
     funDigitalWrite( INT_PIN, int_on ? FUN_LOW : FUN_HIGH );
+    funDigitalWrite( STATUS_LED_PIN, (regs[REG_CONFIG] & CONFIG_STATUS_LED) ? FUN_HIGH : FUN_LOW );
 
-    if( (regs[REG_CONFIG] & CONFIG_FEEDBACK) && pos ) {
-        int led = (pos - 1) * NUM_LEDS / 255;
+    // also clears on lift, else the last LED under the finger stays lit
+    if( (regs[REG_CONFIG] & CONFIG_FEEDBACK) && (pos || last_pos) ) {
         for( int i = 0; i < NUM_LEDS*3; i++ ) { regs[REG_LEDS + i] = 0; }
-        wheel( pos, &regs[REG_LEDS + led*3] );
+        if( pos ) {
+            int led = (pos - 1) * NUM_LEDS / 255;
+            wheel( pos, &regs[REG_LEDS + led*3] );
+        }
         leds_dirty = true;
     }
+    last_pos = pos;
 }
 
 int main()
@@ -178,6 +187,7 @@ int main()
     leds_dirty = true;  // show initial (all off)
 
     funPinMode( INT_PIN, GPIO_Speed_10MHz | GPIO_CNF_OUT_OD );
+    funPinMode( STATUS_LED_PIN, GPIO_Speed_10MHz | GPIO_CNF_OUT_PP );
     funDigitalWrite( INT_PIN, FUN_HIGH );
 
     // alternate function open-drain: I2C peripheral drives the pins

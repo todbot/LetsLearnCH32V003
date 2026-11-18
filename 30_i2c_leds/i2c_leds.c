@@ -3,7 +3,7 @@
 //
 // - I2C SDA on PC1, SCL on PC2, needs pull-ups (Stemma QT hosts have them)
 // - LED data on PC6
-// - Register map is a subset of the full one in 60_i2c_touch_leds
+// - Register map is a subset of the full one in 60_touchwheel
 // - Write [reg, data...] to set regs, write [reg] then read to get regs
 
 #include "ch32fun.h"

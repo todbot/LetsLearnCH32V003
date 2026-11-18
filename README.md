@@ -112,7 +112,8 @@ be doing more complicated tasks than the standard button reading.
 | [`40_touch_printf`](40_touch_printf/) | ADC captouch, filtering, baseline, wheel pos, printf |
 | [`45_touch_ws2812`](45_touch_ws2812/) | 40 + 20: LED n lights while pad n is touched |
 | [`50_i2c_touch`](50_i2c_touch/) | I2C target reporting touch status/pos/raw, INT pin |
-| [`60_i2c_touch_leds`](60_i2c_touch_leds/) | complete custom-register device + Python driver |
+| [`60_touchwheel`](60_touchwheel/) | complete custom-register device + Python driver |
+| [`62_touchwheelsao_clone`](62_touchwheelsao_clone/) | 60 with the TouchwheelSAO register map |
 | [`70_seesaw`](70_seesaw/) | Adafruit seesaw compatible (STATUS, NEOPIXEL, TOUCH) |
 | [`80_oled`](80_oled/) | 128x32 SSD1306 OLED on bit-banged I2C: text, big counter, bar |
 
@@ -152,14 +153,18 @@ make monitor   # to watch printfs()
    - status, pos and deltas follow fingers
    - events latch and clear, INT (PC7) goes low and back
    - readings stay steady while the host polls hard
-6. **60_i2c_touch_leds** (`host/code.py` + `touchwheelqwiic.py`)
+6. **60_touchwheel** (`host/code.py` + `touchwheelqwiic.py`)
    - no false touches or LED glitches while touching during LED updates
    - try `CONFIG` feedback bit
-7. **70_seesaw** (`host/code.py`)
+   - `CONFIG` bit3 lights the PD6 status LED
+7. **62_touchwheelsao_clone** (`host/code.py` + `touchwheel.py`, from TouchwheelSAO)
+   - with no host code, the LED under your finger lights (feedback is on by default)
+   - the TouchwheelSAO demo runs unchanged apart from its I2C pins
+8. **70_seesaw** (`host/code.py`)
    - stock `adafruit_seesaw` connects
    - `touch_read(4..7)` tracks the pads
    - NeoPixels light
-8. **80_oled**
+9. **80_oled**
    - OLED shows "80_oled", a counting number and a bar sweeping along the bottom
    - `make monitor` shows the refresh time once
    - if it prints `no OLED`, check wiring and that the module is at 0x3C
@@ -189,32 +194,33 @@ CH32V003F4P6 (TSSOP-20) dev board.
 
 ### Pins per stage (dev board)
 
-| Pin | 10 | 12 | 15 | 20 | 30 | 40 | 45 | 50 | 60 | 70 | 80 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| PA1 | | | | | | | | | | | |
-| PA2 | | | | | | | | | | | |
-| PC0 | | btn | | | | | | | | | |
-| PC1 | | | | | SDA | | | SDA | SDA | SDA | |
-| PC2 | | | | | SCL | | | SCL | SCL | SCL | |
-| PC3 | | | | | | | | | | | oSDA |
-| PC4 | | | | | | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | oSCL |
-| PC5 | | | | | | | | | | | |
-| PC6 | | | | LEDs | LEDs | | LEDs | | LEDs | LEDs | |
-| PC7 | | | | | | | | INT | INT | | |
-| PD0 | | | | | | | | | | | |
-| PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
-| PD2 | | | | | | pad0 | pad0 | pad0 | pad0 | pad0 | |
-| PD3 | | | | | | pad1 | pad1 | pad1 | pad1 | pad1 | |
-| PD4 | | | | | | pad2 | pad2 | pad2 | pad2 | pad2 | |
-| PD5 | | | | | | | | | | | |
-| PD6 | LED | LED | LED | | | | | | | | |
-| PD7 | | | | | | | | | | | |
+| Pin | 10 | 12 | 15 | 20 | 30 | 40 | 45 | 50 | 60 | 62 | 70 | 80 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| PA1 | | | | | | | | | | | | |
+| PA2 | | | | | | | | | | | | |
+| PC0 | | btn | | | | | | | | | | |
+| PC1 | | | | | SDA | | | SDA | SDA | SDA | SDA | |
+| PC2 | | | | | SCL | | | SCL | SCL | SCL | SCL | |
+| PC3 | | | | | | | | | | | | oSDA |
+| PC4 | | | | | | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | oSCL |
+| PC5 | | | | | | | | | | | | |
+| PC6 | | | | LEDs | LEDs | | LEDs | | LEDs | LEDs | LEDs | |
+| PC7 | | | | | | | | INT | INT | INT | | |
+| PD0 | | | | | | | | | | | | |
+| PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
+| PD2 | | | | | | pad0 | pad0 | pad0 | pad0 | pad0 | pad0 | |
+| PD3 | | | | | | pad1 | pad1 | pad1 | pad1 | pad1 | pad1 | |
+| PD4 | | | | | | pad2 | pad2 | pad2 | pad2 | pad2 | pad2 | |
+| PD5 | | | | | | | | | | | | |
+| PD6 | LED | LED | LED | | | | | LED | LED | LED | | |
+| PD7 | | | | | | | | | | | | |
 
 What each pin does:
 - **SWIO (PD1):** programming, and debug printf (`make monitor`), in every
   stage. Only GND, 3V3 and SWIO go to the programmer.
-- **LED (PD6, stages 10-15):** push-pull output. Wire it through 330 ohm to an
-  LED and then GND.
+- **LED (PD6, stages 10-15, 50-62):** push-pull output. Wire it through 330 ohm to an
+  LED and then GND. In 50 and 60 it's the status LED, set by `CONFIG` bit3. In 62 it's
+  set by `LED_STATUS`.
 - **btn (PC0, stage 12):** the dev board's button connects PC0 to VDD, so it's read as an input
   with pull-down and a press reads 1. In every stage, never drive PC0 low: a press would short
   VDD to it.
@@ -223,7 +229,7 @@ What each pin does:
 - **LEDs (PC6):** WS2812 data. It is SPI1 MOSI, fixed by the driver. Use a
   74AHCT1G125 buffer for 5V LEDs.
 - **pad0-3:** captouch on ADC channels. PC4=A2, PD2=A3, PD3=A4, PD4=A7.
-  - 40, 50 and 60 default to a 3-pad wheel on PD2/PD3/PD4. PC4 is an optional 4th pad.
+  - 40, 50, 60 and 62 default to a 3-pad wheel on PD2/PD3/PD4. PC4 is an optional 4th pad.
   - The 4-pad map is commented out next to it in their `.c` files.
 - **INT (PC7):** open-drain output, active low. It's low while
   `TOUCH_EVENTS != 0`.
@@ -237,13 +243,13 @@ Other pins:
 - **PD1:** the dev board's LED is on it, wired to VDD, so it lights while SWIO is low
 - **PC3 (except 80), PC5, PD0:** free
 
-### Stage 60 on the dev board (CH32V003F4P6, TSSOP-20)
+### Stages 60 and 62 on the dev board (CH32V003F4P6, TSSOP-20)
 
 ```
                         +----\/----+
      pad2  A7  PD4   1 -|          |- 20  PD3  A4  pad1
    (UART TX)   PD5   2 -|          |- 19  PD2  A3  pad0
-   (10: LED)   PD6   3 -|          |- 18  PD1  SWIO -> programmer
+ (status LED)  PD6   3 -|          |- 18  PD1  SWIO -> programmer
        NRST    PD7   4 -|          |- 17  PC7  INT out (active low)
                PA1   5 -|          |- 16  PC6  WS2812 data (SPI1 MOSI)
                PA2   6 -|          |- 15  PC5
@@ -349,7 +355,7 @@ Processing in `touch_update()`, per pad:
 | 0x01 | R | `FW_VERSION` | stage number |
 | 0x02 | R | `TOUCH_STATUS` | bit n = pad n touched |
 | 0x03 | R/W | `TOUCH_EVENTS` | latched presses, write 1s to clear |
-| 0x04 | R/W | `CONFIG` | bit0 INT en, bit1 autoshow, bit2 feedback |
+| 0x04 | R/W | `CONFIG` | bit0 INT en, bit1 autoshow, bit2 feedback, bit3 status LED |
 | 0x05 | R/W | `BRIGHTNESS` | 0-255 global LED scale |
 | 0x06 | W | `COMMAND` | 0x01 show, 0x02 recalibrate, 0xA5 reset |
 | 0x07 | R | `WHEEL_POS` | 0 = no touch, 1-255 around wheel |
@@ -360,7 +366,40 @@ Processing in `touch_update()`, per pad:
 
 - autoshow: LEDs update after any write that reaches 0x20+
 - feedback: firmware lights the LED under your finger (overwrites LED regs)
+- status LED: lights the LED on PD6 (50 and 60)
 - INT asserts while `TOUCH_EVENTS != 0` and `CONFIG` bit0 is set
+
+## TouchwheelSAO clone map (stage 62)
+
+62 is 60 with registers 0x00-0x1B laid out like the
+[TouchwheelSAO](https://github.com/todbot/TouchwheelSAO), so the SAO's own host driver
+(`host/touchwheel.py`) works with it. 60's extras sit from 0x1C up.
+
+| Addr | R/W | Name | Notes |
+|---|---|---|---|
+| 0x00 | R | `POSITION` | 0 = no touch, 1-255 around the wheel |
+| 0x01 | R | `TOUCHES` | bit n = pad n touched |
+| 0x02-0x07 | R | `RAW0-2` | u16 filtered reading, pads 0-2 |
+| 0x08-0x0D | R/W | `THRESH0-2` | u16 delta above baseline, pads 0-2 |
+| 0x0E | R/W | `LED_STATUS` | non-zero lights the LED on PD6 |
+| 0x0F-0x11 | R/W | `LED_RGB` | R,G,B: writing a channel sets it on all LEDs |
+| 0x12-0x1A | R/W | `LED0-2` | R,G,B of LEDs 0-2, same data as the first 9 bytes of `LEDS` |
+| 0x1B | R | `VERSION` | 62 |
+| 0x1C | R | `WHO_AM_I` | 0xC3 |
+| 0x1D | R/W | `EVENTS` | latched presses, write 1s to clear |
+| 0x1E | R/W | `CONFIG` | bit0 INT en, bit1 autoshow, bit2 feedback |
+| 0x1F | R/W | `BRIGHTNESS` | 0-255 global LED scale |
+| 0x20 | W | `COMMAND` | 0x01 show, 0x02 recalibrate, 0xA5 reset |
+| 0x22-0x23 | R | `RAW3` | u16, optional pad 3 |
+| 0x24-0x25 | R/W | `THRESH3` | u16, optional pad 3 |
+| 0x28-0x2F | R | `BASELINE0-3` | u16 |
+| 0x40-0x57 | R/W | `LEDS` | R,G,B for all 8 LEDs |
+
+- feedback is on by default, like the SAO
+- Differences from the TouchwheelSAO:
+  - `TOUCHES` bits are in pad order. The SAO puts pad 0 in bit 2.
+  - `THRESH` is a delta above baseline and writable. The SAO's is an absolute count.
+  - Multi-byte reads work, and LEDs don't fade out after a touch.
 
 ## Seesaw mode (stage 70)
 

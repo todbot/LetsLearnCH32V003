@@ -1,4 +1,4 @@
-# code.py -- CircuitPython demo for 60_i2c_touch_leds
+# code.py -- CircuitPython demo for 60_touchwheel
 # 14 Nov 2026 - @todbot / Tod Kurt
 # copy touchwheelqwiic.py to CIRCUITPY too
 import time, board, busio

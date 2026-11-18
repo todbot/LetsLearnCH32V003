@@ -1,4 +1,4 @@
-# touchwheelqwiic.py -- CircuitPython/MicroPython driver for 60_i2c_touch_leds
+# touchwheelqwiic.py -- CircuitPython/MicroPython driver for 60_touchwheel
 # 14 Nov 2026 - @todbot / Tod Kurt
 import struct
 
@@ -11,6 +11,7 @@ _WHO_AM_I_VAL = 0xC3
 CONFIG_INT_ENABLE = 0x01
 CONFIG_AUTOSHOW = 0x02
 CONFIG_FEEDBACK = 0x04
+CONFIG_STATUS_LED = 0x08
 
 class Touchwheel:
     def __init__(self, i2c, addr=0x54, num_pads=4, num_leds=8):
@@ -86,6 +87,11 @@ class Touchwheel:
     def rgbs(self, colors):
         """set LEDs from list of (r,g,b)"""
         self._write(_LEDS, bytes(c for rgb in colors for c in rgb))
+
+    def status_led(self, on):
+        """turn the PD6 status LED on or off"""
+        cfg = self.config
+        self.config = (cfg | CONFIG_STATUS_LED) if on else (cfg & ~CONFIG_STATUS_LED)
 
     def show(self):
         """only needed if CONFIG_AUTOSHOW is off"""
