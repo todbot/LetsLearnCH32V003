@@ -30,9 +30,9 @@ The USB connector is just for power, no data lines connect to the chip.
 
 <img src="./docs/CH32V003F4P6-devboard-both.jpg" width="500">
 
-For use in a breadboard, I like to solder the header pins on and put a 3-pin 
-female header instead of male pins for the programming pins. The programming
-port can also supply power to the board.
+For use in a breadboard, I like to solder the header pins on, including the
+3-pin pin header for the programming pins. The programming port can also 
+supply power to the board, which is why I put a red 'X' on the USB-C jack.
 
 <img src="./docs/CH32V003F4P6_devboard_soldered.jpg" width="400">
 
@@ -59,15 +59,16 @@ esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset \
 ```
 
 Then solder three jumpers to the ESP32-S2 board: Gnd, 3V3, IO6 for SWIO.
-I like the [Lolin S2Mini](https://link.amazon/B0aM3kL9F). The result looks like:
-You may want to do a female header here and male on the board.
+I like the [Lolin S2Mini](https://link.amazon/B0aM3kL9F). The result looks like
+the below. Use 3 M-F jumper wires to go from the programmer to the dev board.
 
 <img src="./docs/ESP32-S2_CH32V003Programmer.jpg" width="400">
 
 ## Breadboard setup
 
 A number of peripherals will be attached to the CH32V003 board.  Here's how
-my breadboard is set up for most of the sketches. Exact [pins used](#pins) described below.
+my breadboard is set up for most of the sketches. 
+Exact [pins used](#pins) described below.
 
 <img src="./docs/todbot-breadboard0.jpg" width="500">
 
