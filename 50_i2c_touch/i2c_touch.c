@@ -12,9 +12,18 @@
 #define I2C_ADDR (0x54)
 #define INT_PIN PC7
 
-#define NUM_PADS (4)
+// for 3-pad wheel
+#define NUM_PADS (3)
 #define TOUCH_WHEEL (1)
-#define TOUCH_PINS { {GPIOC,4,2}, {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7} }
+// {port, pin, adc_chan}
+#define TOUCH_PINS { {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7} }
+
+// for 4-pad wheel
+/* #define NUM_PADS (4) */
+/* #define TOUCH_WHEEL (1) */
+/* // {port, pin, adc_chan} */
+/* #define TOUCH_PINS { {GPIOC,4,2}, {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7} } */
+
 #include "touch.h"
 
 #define WHO_AM_I_VAL (0xC3)

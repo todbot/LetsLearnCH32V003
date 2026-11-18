@@ -22,6 +22,7 @@
 #include "touch.h"
 
 #define WS2812DMA_IMPLEMENTATION
+#define DMALEDS (32)  // driver's default 16 drops the last 2 of 8 LEDs (and 7-9, 15-17...)
 // no color order define: callback's bits 23-0 go out MSB first, so the
 // host's bytes (already in wire order) go out as sent
 #define WS2812B_ALLOW_INTERRUPT_NESTING

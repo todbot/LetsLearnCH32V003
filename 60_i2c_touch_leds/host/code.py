@@ -1,10 +1,11 @@
 # code.py -- CircuitPython demo for 60_i2c_touch_leds
 # 14 Nov 2026 - @todbot / Tod Kurt
 # copy touchwheelqwiic.py to CIRCUITPY too
-import time, board
+import time, board, busio
 from touchwheelqwiic import Touchwheel, CONFIG_INT_ENABLE, CONFIG_AUTOSHOW
 
-tw = Touchwheel(board.STEMMA_I2C())
+i2c = busio.I2C(board.SCL1, board.SDA1, frequency=400_000)
+tw = Touchwheel(i2c, num_pads=3)
 tw.brightness = 32
 num_leds = tw.num_leds
 

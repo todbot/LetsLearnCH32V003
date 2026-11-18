@@ -8,7 +8,7 @@ CONFIG_AUTOSHOW = 1 << 1
 CMD_SHOW = 0x01
 NUM_LEDS = 8
 
-i2c = busio.I2C(board.SCL, board.SDA, frequency=100_000)
+i2c = busio.I2C(board.SCL1, board.SDA1, frequency=400_000)
 while not i2c.try_lock(): pass
 print("scan:", [hex(a) for a in i2c.scan()])
 
@@ -48,5 +48,6 @@ i = 0
 while True:
     c = colors[i % len(colors)]
     write_regs(REG_LEDS, bytes(c) * NUM_LEDS)  # autoshow is on by default
+    print("color:",c)
     i += 1
     time.sleep(0.5)

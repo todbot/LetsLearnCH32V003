@@ -14,6 +14,7 @@
 #define NUM_LEDS (8)
 
 #define WS2812DMA_IMPLEMENTATION
+#define DMALEDS (32)  // driver's default 16 drops the last 2 of 8 LEDs (and 7-9, 15-17...)
 #define WSGRB
 #define WS2812B_ALLOW_INTERRUPT_NESTING
 #include "ws2812b_dma_spi_led_driver.h"

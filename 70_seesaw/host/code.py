@@ -1,13 +1,14 @@
 # code.py -- CircuitPython test for 70_seesaw, stock adafruit_seesaw only
 # 14 Nov 2026 - @todbot / Tod Kurt
-import time, board
+import time, board, busio
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.neopixel import NeoPixel
 
 NUM_LEDS = 8
 TOUCH_PINS = (4, 5, 6, 7)  # Crickit's touch pins, firmware maps to pads 0-3
 
-ss = Seesaw(board.STEMMA_I2C(), 0x49)
+i2c = busio.I2C(board.SCL1, board.SDA1, frequency=400_000)
+ss = Seesaw(i2c, 0x49)
 print("hw_id: %02x  version: %08x  options: %08x" %
       (ss.chip_id, ss.get_version(), ss.get_options()))
 

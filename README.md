@@ -141,6 +141,7 @@ make monitor   # to watch printfs()
    - scan finds 0x54
    - the 8-byte read of regs 0-7 is correct, not just the first byte
    - the out-of-range write is harmless
+   - with autoshow off, LEDs hold for 2 secs, then `CMD_SHOW` turns them magenta
    - LEDs cycle colors
 4. **40_touch_printf**
    - delta clearly separates touched from untouched on every pad
@@ -196,15 +197,15 @@ CH32V003F4P6 (TSSOP-20) dev board.
 | PC1 | | | | | SDA | | | SDA | SDA | SDA | |
 | PC2 | | | | | SCL | | | SCL | SCL | SCL | |
 | PC3 | | | | | | | | | | | oSDA |
-| PC4 | | | | | | pad0 | pad0 | pad0 | pad0 | pad0 | oSCL |
+| PC4 | | | | | | | pad0 | | | pad0 | oSCL |
 | PC5 | | | | | | | | | | | |
 | PC6 | | | | LEDs | LEDs | | LEDs | | LEDs | LEDs | |
 | PC7 | | | | | | | | INT | INT | | |
 | PD0 | | | | | | | | | | | |
 | PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
-| PD2 | | | | | | pad1 | pad1 | pad1 | pad1 | pad1 | |
-| PD3 | | | | | | pad2 | pad2 | pad2 | pad2 | pad2 | |
-| PD4 | | | | | | pad3 | pad3 | pad3 | pad3 | pad3 | |
+| PD2 | | | | | | pad0 | pad1 | pad0 | pad0 | pad1 | |
+| PD3 | | | | | | pad1 | pad2 | pad1 | pad1 | pad2 | |
+| PD4 | | | | | | pad2 | pad3 | pad2 | pad2 | pad3 | |
 | PD5 | | | | | | | | | | | |
 | PD6 | LED | LED | LED | | | | | | | | |
 | PD7 | | | | | | | | | | | |
@@ -221,8 +222,9 @@ What each pin does:
   provides the pull-ups. These pins are 5V tolerant.
 - **LEDs (PC6):** WS2812 data. It is SPI1 MOSI, fixed by the driver. Use a
   74AHCT1G125 buffer for 5V LEDs.
-- **pad0-3:** captouch on ADC channels. PC4=A2, PD2=A3, PD3=A4, PD4=A7. With
-  `NUM_PADS 3`, PD4 is unused.
+- **pad0-3:** captouch on ADC channels. PC4=A2, PD2=A3, PD3=A4, PD4=A7.
+  - 40, 50 and 60 default to a 3-pad wheel on PD2/PD3/PD4, so PC4 is unused there.
+  - The 4-pad map is commented out next to it in their `.c` files.
 - **INT (PC7):** open-drain output, active low. It's low while
   `TOUCH_EVENTS != 0`.
 - **oSDA/oSCL (PC3/PC4):** bit-banged I2C to the OLED, kept off I2C1 so I2C1 can be a
@@ -239,13 +241,13 @@ Other pins:
 
 ```
                         +----\/----+
-     pad3  A7  PD4   1 -|          |- 20  PD3  A4  pad2
-   (UART TX)   PD5   2 -|          |- 19  PD2  A3  pad1
+     pad2  A7  PD4   1 -|          |- 20  PD3  A4  pad1
+   (UART TX)   PD5   2 -|          |- 19  PD2  A3  pad0
    (10: LED)   PD6   3 -|          |- 18  PD1  SWIO -> programmer
        NRST    PD7   4 -|          |- 17  PC7  INT out (active low)
                PA1   5 -|          |- 16  PC6  WS2812 data (SPI1 MOSI)
                PA2   6 -|          |- 15  PC5
-        GND    VSS   7 -|          |- 14  PC4  A2  pad0
+        GND    VSS   7 -|          |- 14  PC4  A2
                PD0   8 -|          |- 13  PC3
        3.3V    VDD   9 -|          |- 12  PC2  I2C SCL
     (button)   PC0  10 -|          |- 11  PC1  I2C SDA
@@ -384,8 +386,14 @@ The lib only accepts certain chip IDs, and Crickit's pinmap allows
   for each chunk to be read. With `minichlink -T` running, every line slows the loop, so
   print on changes, not every pass. With nothing reading, the first printf times out
   (~120ms), then printf skips output without waiting. The I2C stages don't printf.
+- **Changing host I2C speed:** after the host switched from 100kHz to 400kHz, the CH32 didn't
+  respond until it was reset. Reset the CH32 after changing bus speed, or if the host suddenly
+  gets timeouts or no ACK. The cause isn't known yet.
 - **Touch vs. LEDs:** touch is only sampled when no LED DMA transfer is
   running.
+- **`DMALEDS 32`** is set before including ch32fun's WS2812 driver. With its default of 16,
+  8 LEDs show only the first 6 (7-9 and 15-17 LEDs lose some too). With 32, 15-21 LEDs
+  lose some instead, so recheck if you change `NUM_LEDS`.
 - **TOUCH_THRESH_DEFAULT** (500, in `touch.h`) comes from buttons4x0 pads on the dev board:
   touches read ~3000-3600 above baseline, idle noise peaks around ±230 raw. Retune with
   `40_touch_printf` for other pads or overlays.

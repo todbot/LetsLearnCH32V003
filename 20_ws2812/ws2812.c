@@ -11,6 +11,7 @@
 #define NUM_LEDS (8)
 
 #define WS2812DMA_IMPLEMENTATION
+#define DMALEDS (32)  // driver's default 16 drops the last 2 of 8 LEDs (and 7-9, 15-17...)
 #define WSGRB  // WS2812 wire order is G,R,B; callback still returns 0xBBGGRR
 #define WS2812B_ALLOW_INTERRUPT_NESTING  // let DMA ISR preempt others (I2C later)
 #include "ws2812b_dma_spi_led_driver.h"

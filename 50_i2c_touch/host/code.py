@@ -3,11 +3,11 @@
 import time, struct, board, busio, digitalio
 
 ADDR = 0x54
-NUM_PADS = 4
+NUM_PADS = 3
 REG_TOUCH_STATUS, REG_TOUCH_EVENTS, REG_COMMAND = 0x02, 0x03, 0x06
 REG_WHEEL_POS, REG_TOUCH_RAW, REG_TOUCH_BASELINE = 0x07, 0x08, 0x10
 
-i2c = busio.I2C(board.SCL, board.SDA, frequency=100_000)
+i2c = busio.I2C(board.SCL1, board.SDA1, frequency=400_000)
 while not i2c.try_lock(): pass
 print("scan:", [hex(a) for a in i2c.scan()])
 
