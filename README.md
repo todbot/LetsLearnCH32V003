@@ -60,7 +60,7 @@ esptool.py -p /dev/tty.usbmodem01 -b 460800 --before=no_reset --after=no_reset \
 
 Then solder three jumpers to the ESP32-S2 board: Gnd, 3V3, IO6 for SWIO.
 I like the [Lolin S2Mini](https://link.amazon/B0aM3kL9F). The result looks like
-the below. Use 3 M-F jumper wires to go from the programmer to the dev board.
+the below. Use 3 F-F jumper wires to go from the programmer to the dev board.
 
 <img src="./docs/ESP32-S2_CH32V003Programmer.jpg" width="400">
 
