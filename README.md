@@ -197,15 +197,15 @@ CH32V003F4P6 (TSSOP-20) dev board.
 | PC1 | | | | | SDA | | | SDA | SDA | SDA | |
 | PC2 | | | | | SCL | | | SCL | SCL | SCL | |
 | PC3 | | | | | | | | | | | oSDA |
-| PC4 | | | | | | | pad0 | | | pad0 | oSCL |
+| PC4 | | | | | | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | oSCL |
 | PC5 | | | | | | | | | | | |
 | PC6 | | | | LEDs | LEDs | | LEDs | | LEDs | LEDs | |
 | PC7 | | | | | | | | INT | INT | | |
 | PD0 | | | | | | | | | | | |
 | PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
-| PD2 | | | | | | pad0 | pad1 | pad0 | pad0 | pad1 | |
-| PD3 | | | | | | pad1 | pad2 | pad1 | pad1 | pad2 | |
-| PD4 | | | | | | pad2 | pad3 | pad2 | pad2 | pad3 | |
+| PD2 | | | | | | pad0 | pad0 | pad0 | pad0 | pad0 | |
+| PD3 | | | | | | pad1 | pad1 | pad1 | pad1 | pad1 | |
+| PD4 | | | | | | pad2 | pad2 | pad2 | pad2 | pad2 | |
 | PD5 | | | | | | | | | | | |
 | PD6 | LED | LED | LED | | | | | | | | |
 | PD7 | | | | | | | | | | | |
@@ -223,7 +223,7 @@ What each pin does:
 - **LEDs (PC6):** WS2812 data. It is SPI1 MOSI, fixed by the driver. Use a
   74AHCT1G125 buffer for 5V LEDs.
 - **pad0-3:** captouch on ADC channels. PC4=A2, PD2=A3, PD3=A4, PD4=A7.
-  - 40, 50 and 60 default to a 3-pad wheel on PD2/PD3/PD4, so PC4 is unused there.
+  - 40, 50 and 60 default to a 3-pad wheel on PD2/PD3/PD4. PC4 is an optional 4th pad.
   - The 4-pad map is commented out next to it in their `.c` files.
 - **INT (PC7):** open-drain output, active low. It's low while
   `TOUCH_EVENTS != 0`.
@@ -247,7 +247,7 @@ Other pins:
        NRST    PD7   4 -|          |- 17  PC7  INT out (active low)
                PA1   5 -|          |- 16  PC6  WS2812 data (SPI1 MOSI)
                PA2   6 -|          |- 15  PC5
-        GND    VSS   7 -|          |- 14  PC4  A2
+        GND    VSS   7 -|          |- 14  PC4  A2  pad3 (optional)
                PD0   8 -|          |- 13  PC3
        3.3V    VDD   9 -|          |- 12  PC2  I2C SCL
     (button)   PC0  10 -|          |- 11  PC1  I2C SDA

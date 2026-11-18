@@ -10,7 +10,7 @@
 #define NUM_PADS (4)
 #define TOUCH_WHEEL (0)
 // {port, pin, adc_chan}
-#define TOUCH_PINS { {GPIOC,4,2}, {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7} }
+#define TOUCH_PINS { {GPIOD,2,3}, {GPIOD,3,4}, {GPIOD,4,7}, {GPIOC,4,2} }
 #include "touch.h"
 
 #define NUM_LEDS (8)
