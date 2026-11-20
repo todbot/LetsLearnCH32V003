@@ -1,7 +1,7 @@
 # LetsLearnCH32V003
 
 Let's learn how to program the "10 cent" CH32V003 chip in plain C 
-on [ch32fun](https://github.com/cnlohr/ch32fun), as a series of small sketch stages.
+on [ch32fun](https://github.com/cnlohr/ch32fun), as a series of small examples.
 
 ## Assumptions
 
