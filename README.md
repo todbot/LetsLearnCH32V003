@@ -123,7 +123,7 @@ Each example is self-contained and builds on its own.
 | [`60_touchwheel`](60_touchwheel/) | complete custom-register device + Python driver |
 | [`62_touchwheelsao_clone`](62_touchwheelsao_clone/) | 60 with the TouchwheelSAO register map |
 | [`70_seesaw`](70_seesaw/) | Adafruit seesaw compatible (STATUS, NEOPIXEL, TOUCH) |
-| [`80_oled`](80_oled/) | 128x32 SSD1306 OLED on bit-banged I2C: text, big counter, bar |
+| [`80_oled`](80_oled/) | 128x64 SSD1306 OLED on bit-banged I2C: text, big counter, bar |
 
 Each I2C example has a CircuitPython test in `host/`.
 
