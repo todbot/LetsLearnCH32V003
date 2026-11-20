@@ -44,9 +44,9 @@ I didn't want to wait. Thankfully you can make a CH32 programmer from another
 dev board. I used cnlohr's ESP32-S2-based "ch32v003programmer":
 
 Steps:
-- Download https://github.com/cnlohr/esp32s2-cookbook to get "ch32v003programmer" then do:
+- Download https://github.com/cnlohr/esp32s2-cookbook to get "ch32v003programmer"
 - Plug in an ESP32-S2 board, hold BOOT + tap RESET to put into bootloader mode
-- Install ch32v003programmer
+- Install ch32v003programmer on ESP32-S2 board
 
 ```sh
 git clone https://github.com/cnlohr/esp32s2-cookbook
