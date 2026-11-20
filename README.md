@@ -68,13 +68,18 @@ the below. Use 3 F-F jumper wires to go from the programmer to the dev board.
 
 A number of peripherals will be attached to the CH32V003 board.  Here's how
 my breadboard is set up for most of the sketches. 
-Exact [pins used](#pins) described below. 
 
 <img src="./docs/todbot-breadboard0.jpg" width="500">
 
-In the above photo, I also have a Adafruit QTPy RP2040 hooked up via its StemmaQT
-connector to the I2C pins of the dev board.
+Exact [pins used](#pins) described below. In the above photo, the following 
+are wired up:
 
+- CH32V003 dev board
+- ESP32-S2 Mini as CH32v003progrmamer
+- LED w/ resistor
+- WS2812 RGB LED strip 
+- 3 pad captouch touchwheel
+- StemmaQT adapter hooked up to QTPy RP2040 for I2C
 
 ## Software setup
  
@@ -129,9 +134,10 @@ Each I2C stage has a CircuitPython test in `host/`.
    - LED on PD6 blinks
    - `make monitor` shows `blink N`
    - if not, switch to UART printf in `funconfig.h`
-- **[`12_button`](12_button/):** each press toggles the LED and prints one `press`
-  and one `release`
-- **[`15_blink_input`](15_blink_input/):** keys 1-9,0 set 10-1000 ms, other keys a random time
+- **[`12_button`](12_button/)**
+   - each press toggles the LED and prints one `press` and one `release`
+- **[`15_blink_input`](15_blink_input/)** 
+   - keys 1-9,0 set 10-1000 ms, other keys a random time
 - **[`20_ws2812`](20_ws2812/)**
    - boot shows all red, then green, then blue (checks `WSGRB` order)
    - then a rainbow chase
@@ -145,8 +151,8 @@ Each I2C stage has a CircuitPython test in `host/`.
    - delta clearly separates touched from untouched on every pad
    - set `TOUCH_ITERS` / `TOUCH_THRESH_DEFAULT` in `touch.h` from this
    - wheel pos sweeps 1-255 with no dead zones or jumps
-- **[`45_touch_ws2812`](45_touch_ws2812/):** each pad lights its LED, and deltas don't
-  change when LEDs turn on
+- **[`45_touch_ws2812`](45_touch_ws2812/)**
+  - each pad lights its LED, and deltas don't change when LEDs turn on
 - **[`50_i2c_touch`](50_i2c_touch/)** (`host/code.py`)
    - status, pos and deltas follow fingers
    - events latch and clear, INT (PC7) goes low and back
