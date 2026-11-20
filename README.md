@@ -108,8 +108,7 @@ make
 
 ## Examples
 
-Each example is self-contained and builds on its own. Most of these will
-be doing more complicated tasks than the standard button reading. 
+Each example is self-contained and builds on its own. 
 
 | Stage | What it adds |
 |---|---|
