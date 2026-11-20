@@ -125,7 +125,7 @@ Each example is self-contained and builds on its own.
 | [`70_seesaw`](70_seesaw/) | Adafruit seesaw compatible (STATUS, NEOPIXEL, TOUCH) |
 | [`80_oled`](80_oled/) | 128x32 SSD1306 OLED on bit-banged I2C: text, big counter, bar |
 
-Each I2C stage has a CircuitPython test in `host/`.
+Each I2C example has a CircuitPython test in `host/`.
 
 ## Example Details
 
@@ -255,7 +255,7 @@ Other pins:
 - **PD1:** the dev board's LED is on it, wired to VDD, so it lights while SWIO is low
 - **PC3 (except 80), PC5, PD0:** free
 
-### Stages 60 and 62 on the dev board (CH32V003F4P6, TSSOP-20)
+### Examples 60 and 62 on the dev board (CH32V003F4P6, TSSOP-20)
 
 ```
                         +----\/----+
