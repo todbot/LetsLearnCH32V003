@@ -37,6 +37,7 @@ int main()
         ssd1306_drawstr_sz( 0, 12, str, 1, fontsize_16x16 );
         int x = count % SSD1306_W;
         ssd1306_fillRect( x, SSD1306_H - 4, 8, 4, 1 );
+        ssd1306_fillRect( (x*2) % SSD1306_W, SSD1306_H - 10, 8, 4, 1 );
 
         uint32_t start = SysTick->CNT;
         ssd1306_refresh();

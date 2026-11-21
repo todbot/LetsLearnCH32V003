@@ -124,6 +124,7 @@ Each example is self-contained and builds on its own.
 | [`62_touchwheelsao_clone`](62_touchwheelsao_clone/) | 60 with the TouchwheelSAO register map |
 | [`70_seesaw`](70_seesaw/) | Adafruit seesaw compatible (STATUS, NEOPIXEL, TOUCH) |
 | [`80_oled`](80_oled/) | 128x64 SSD1306 OLED on bit-banged I2C: text, big counter, bar |
+| [`90_i2c_oled`](90_i2c_oled/) | I2C target (0x55) drawing on the 80 OLED: print, rect, circle |
 
 Each I2C example has a CircuitPython test in `host/`.
 
@@ -172,6 +173,9 @@ Each I2C example has a CircuitPython test in `host/`.
    - OLED shows "80_oled", a counting number and a bar sweeping along the bottom
    - `make monitor` shows the refresh time once
    - if it prints `no OLED`, check wiring and that the module is at 0x3C
+- **[`90_i2c_oled`](90_i2c_oled/)** (`host/code.py` + `i2c_oled.py`)
+   - on boot the OLED shows "90_i2c_oled" and "addr 0x55"
+   - the demo draws text, rects, a circle and a line, then bounces a ball at ~46 fps
 
 ## Compiling examples
 
@@ -206,26 +210,26 @@ CH32V003F4P6 (TSSOP-20) dev board.
 
 ### Pins per stage (dev board)
 
-| Pin | 10 | 12 | 15 | 20 | 30 | 40 | 45 | 50 | 60 | 62 | 70 | 80 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| PA1 | | | | | | | | | | | | |
-| PA2 | | | | | | | | | | | | |
-| PC0 | | btn | | | | | | | | | | |
-| PC1 | | | | | SDA | | | SDA | SDA | SDA | SDA | |
-| PC2 | | | | | SCL | | | SCL | SCL | SCL | SCL | |
-| PC3 | | | | | | | | | | | | oSDA |
-| PC4 | | | | | | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | oSCL |
-| PC5 | | | | | | | | | | | | |
-| PC6 | | | | LEDs | LEDs | | LEDs | | LEDs | LEDs | LEDs | |
-| PC7 | | | | | | | | INT | INT | INT | | |
-| PD0 | | | | | | | | | | | | |
-| PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
-| PD2 | | | | | | pad0 | pad0 | pad0 | pad0 | pad0 | pad0 | |
-| PD3 | | | | | | pad1 | pad1 | pad1 | pad1 | pad1 | pad1 | |
-| PD4 | | | | | | pad2 | pad2 | pad2 | pad2 | pad2 | pad2 | |
-| PD5 | | | | | | | | | | | | |
-| PD6 | LED | LED | LED | | | | | LED | LED | LED | | |
-| PD7 | | | | | | | | | | | | |
+| Pin | 10 | 12 | 15 | 20 | 30 | 40 | 45 | 50 | 60 | 62 | 70 | 80 | 90 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| PA1 | | | | | | | | | | | | | |
+| PA2 | | | | | | | | | | | | | |
+| PC0 | | btn | | | | | | | | | | | |
+| PC1 | | | | | SDA | | | SDA | SDA | SDA | SDA | | SDA |
+| PC2 | | | | | SCL | | | SCL | SCL | SCL | SCL | | SCL |
+| PC3 | | | | | | | | | | | | oSDA | oSDA |
+| PC4 | | | | | | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | pad3 (opt) | oSCL | oSCL |
+| PC5 | | | | | | | | | | | | | |
+| PC6 | | | | LEDs | LEDs | | LEDs | | LEDs | LEDs | LEDs | | |
+| PC7 | | | | | | | | INT | INT | INT | | | |
+| PD0 | | | | | | | | | | | | | |
+| PD1 | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO | SWIO |
+| PD2 | | | | | | pad0 | pad0 | pad0 | pad0 | pad0 | pad0 | | |
+| PD3 | | | | | | pad1 | pad1 | pad1 | pad1 | pad1 | pad1 | | |
+| PD4 | | | | | | pad2 | pad2 | pad2 | pad2 | pad2 | pad2 | | |
+| PD5 | | | | | | | | | | | | | |
+| PD6 | LED | LED | LED | | | | | LED | LED | LED | | | |
+| PD7 | | | | | | | | | | | | | |
 
 What each pin does:
 - **SWIO (PD1):** programming, and debug printf (`make monitor`), in every
@@ -253,7 +257,7 @@ Other pins:
 - **PD7:** NRST by default (option bytes), unused
 - **PA1/PA2:** free. These boards have no crystal, the V003 runs on its internal RC
 - **PD1:** the dev board's LED is on it, wired to VDD, so it lights while SWIO is low
-- **PC3 (except 80), PC5, PD0:** free
+- **PC3 (except 80, 90), PC5, PD0:** free
 
 ### Examples 60 and 62 on the dev board (CH32V003F4P6, TSSOP-20)
 
@@ -412,6 +416,38 @@ Processing in `touch_update()`, per pad:
   - `TOUCHES` bits are in pad order. The SAO puts pad 0 in bit 2.
   - `THRESH` is a delta above baseline and writable. The SAO's is an absolute count.
   - Multi-byte reads work, and LEDs don't fade out after a touch.
+
+## OLED map (stage 90)
+
+Default address 0x55. 1-byte register address, auto-incrementing.
+
+| Addr | R/W | Name | Notes |
+|---|---|---|---|
+| 0x00 | R | `WHO_AM_I` | 0xC4 |
+| 0x01 | R | `FW_VERSION` | 90 |
+| 0x02 | R | `STATUS` | bit0 busy |
+| 0x04 | R/W | `CONFIG` | bit1 autoshow |
+| 0x05 | R/W | `CONTRAST` | 0-255, default 0x8F |
+| 0x06 | W | `COMMAND` | command byte, see below |
+| 0x07-0x2E | W | `ARGS[40]` | command args |
+
+Send a command as one write, `[0x06, cmd, args...]`. Wait until `STATUS` bit0 is clear
+before the next one: a command sent while busy is dropped. Draw commands only change the
+framebuffer. `show` sends it to the OLED (18 ms), or set autoshow to show after every command.
+Colors are 0 or 1.
+
+| Cmd | Name | Args |
+|---|---|---|
+| 0x01 | show | |
+| 0x10 | clear | color |
+| 0x11 | pixel | x, y, color |
+| 0x12 | line | x0, y0, x1, y1, color |
+| 0x13 | rect | x, y, w, h, color |
+| 0x14 | fill_rect | x, y, w, h, color |
+| 0x15 | circle | x, y, r, color |
+| 0x16 | fill_circle | x, y, r, color |
+| 0x17 | print | x, y, size (1-8), color, text (up to 36 chars) |
+| 0xA5 | reset | |
 
 ## Seesaw mode (stage 70)
 
