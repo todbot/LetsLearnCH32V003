@@ -1,7 +1,7 @@
 // i2c_oled.c -- I2C peripheral that draws on a 128x64 SSD1306 OLED
 // 20 Nov 2026 - @todbot / Tod Kurt
 //
-// - I2C SDA on PC1, SCL on PC2, needs pull-ups (Stemma QT hosts have them)
+// - I2C SDA on PC1, SCL on PC2, needs pull-ups
 // - OLED on bit-banged I2C (SDA PC3, SCL PC4), the only device on those pins
 // - Host writes [REG_COMMAND, cmd, args...], polls STATUS until not busy,
 //   then sends the next. Draw commands only change the framebuffer, CMD_SHOW
