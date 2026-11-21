@@ -137,18 +137,19 @@ Each I2C example has a CircuitPython test in `host/`.
 - **[`12_button`](12_button/)**
    - each press toggles the LED and prints one `press` and one `release`
 - **[`15_blink_input`](15_blink_input/)** 
-   - keys 1-9,0 set 10-1000 ms, other keys a random time
+   - while running `make monitor`
+   - press keys 1-9 keys to set 10-1000 ms blink rate, other keys a random time
 - **[`20_ws2812`](20_ws2812/)**
-   - boot shows all red, then green, then blue (checks `WSGRB` order)
-   - then a rainbow chase
+   - boot shows all LEDs red -> green -> blue (checks `WSGRB` order)
+   - then does a rainbow chase
 - **[`30_i2c_leds`](30_i2c_leds/)** (`host/code.py`)
-   - scan finds 0x54
-   - the 8-byte read of regs 0-7 is correct, not just the first byte
-   - the out-of-range write is harmless
+   - host i2c scan finds 0x54
+   - host checks that 8-byte read of regs 0-7 is correct, not just the first byte
    - with autoshow off, LEDs hold for 2 secs, then `CMD_SHOW` turns them magenta
    - LEDs cycle colors
 - **[`40_touch_printf`](40_touch_printf/)**
-   - delta clearly separates touched from untouched on every pad
+   - prints out via `make monitor`
+   - check that delta clearly separates touched from untouched on every pad
    - set `TOUCH_ITERS` / `TOUCH_THRESH_DEFAULT` in `touch.h` from this
    - wheel pos sweeps 1-255 with no dead zones or jumps
 - **[`45_touch_ws2812`](45_touch_ws2812/)**
@@ -156,13 +157,14 @@ Each I2C example has a CircuitPython test in `host/`.
 - **[`50_i2c_touch`](50_i2c_touch/)** (`host/code.py`)
    - status, pos and deltas follow fingers
    - events latch and clear, INT (PC7) goes low and back
-   - readings stay steady while the host polls hard
+   - readings stay steady while the host spams polling
 - **[`60_touchwheel`](60_touchwheel/)** (`host/code.py` + `touchwheelqwiic.py`)
-   - no false touches or LED glitches while touching during LED updates
+   - checks no false touches or LED glitches while touching during LED updates
    - try `CONFIG` feedback bit
    - `CONFIG` bit3 lights the PD6 status LED
 - **[`62_touchwheelsao_clone`](62_touchwheelsao_clone/)** (`host/code.py` + `touchwheel.py`,
   from TouchwheelSAO)
+   - acts like a TouchwheelSAO:
    - with no host code, the LED under your finger lights (feedback is on by default)
    - the TouchwheelSAO demo runs unchanged apart from its I2C pins
 - **[`70_seesaw`](70_seesaw/)** (`host/code.py`)
@@ -172,10 +174,11 @@ Each I2C example has a CircuitPython test in `host/`.
 - **[`80_oled`](80_oled/)**
    - OLED shows "80_oled", a counting number and a bar sweeping along the bottom
    - `make monitor` shows the refresh time once
-   - if it prints `no OLED`, check wiring and that the module is at 0x3C
+   - if it prints `no OLED` in `make monitor`, check wiring & module is at 0x3C
 - **[`90_i2c_oled`](90_i2c_oled/)** (`host/code.py` + `i2c_oled.py`)
-   - on boot the OLED shows "90_i2c_oled" and "addr 0x55"
-   - the demo draws text, rects, a circle and a line, then bounces a ball at ~46 fps
+   - on boot, OLED shows "90_i2c_oled" and "addr 0x55"
+   - the host demo draws text, rects, a circle and a line
+   - then bounces a ball at ~46 fps
 
 ## Compiling examples
 
@@ -207,8 +210,9 @@ reader runs from RAM).
 
 ## Pins
 
-    Pins are set by `#define`s at the top of each `.c` file. Defaults are for a
-CH32V003F4P6 (TSSOP-20) dev board.
+Pins are set by `#define`s at the top of each `.c` file. 
+Defaults are for a CH32V003F4P6 (TSSOP-20) dev board, which should also
+work for the CH32V003F4U6 (QFN-20).
 
 ### Pins per stage (dev board)
 
