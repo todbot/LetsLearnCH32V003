@@ -4,8 +4,9 @@ import time, struct, board, busio, digitalio
 
 ADDR = 0x54
 NUM_PADS = 3
-REG_TOUCH_STATUS, REG_TOUCH_EVENTS, REG_COMMAND = 0x02, 0x03, 0x06
+REG_TOUCH_STATUS, REG_TOUCH_EVENTS, REG_CONFIG, REG_COMMAND = 0x02, 0x03, 0x04, 0x06
 REG_WHEEL_POS, REG_TOUCH_RAW, REG_TOUCH_BASELINE = 0x07, 0x08, 0x10
+CONFIG_INT_ENABLE, CONFIG_STATUS_LED = 0x01, 0x08
 
 i2c = busio.I2C(board.SCL1, board.SDA1, frequency=400_000)
 while not i2c.try_lock(): pass
@@ -22,6 +23,7 @@ def read_regs(reg, n):
     return buf
 
 # one read of status, events, ... raw, baseline so they're consistent
+last_status = None
 while True:
     buf = read_regs(REG_TOUCH_STATUS, REG_TOUCH_BASELINE + NUM_PADS*2 - REG_TOUCH_STATUS)
     status, events = buf[0], buf[1]
@@ -32,6 +34,10 @@ while True:
     irq = "" if int_pin is None else ("INT" if not int_pin.value else "   ")
     print("status:%s events:%s pos:%3d deltas:%s %s" %
           ("{:04b}".format(status), "{:04b}".format(events), pos, deltas, irq))
+    if bool(status) != bool(last_status):  # status LED on PD6 lights while touched
+        led = CONFIG_STATUS_LED if status else 0
+        i2c.writeto(ADDR, bytes([REG_CONFIG, CONFIG_INT_ENABLE | led]))
+    last_status = status
     if events:
         i2c.writeto(ADDR, bytes([REG_TOUCH_EVENTS, events]))  # write 1s to clear
     time.sleep(0.1)
