@@ -182,18 +182,20 @@ Each I2C example has a CircuitPython test in `host/`.
 Every example is compiled & run the same way:
 
 ```sh
-cd 10_blink    # pick a sketch
-make           # compiles and programs
-make monitor   # to watch printfs()
+cd 10_blink        # pick a sketch
+make               # compiles and flashes chip
+make monitor       # to watch printfs() 
+tio /dev/tty.usb*  # in another terminal window to watch code.py if i2c example
 ```
 
-Other things you cando in an example dir:
+Other things you can do in an example dir:
 
 ```sh
-make build     # compile only
-make flash     # compile + flash
-make monitor   # view printf output (over SWIO)
-make clangd    # make compile_commands.json for editors (needs bear)
+make build      # compile only
+make monitor    # view printf output (over SWIO)
+make clangd     # make compile_commands.json for editors (needs bear)
+make gdbserver  # run gdbserver for debugging
+make clean      # remove build products and intermediaries
 ```
 
 If the programmer can't do `make monitor`, change the example's `funconfig.h`
