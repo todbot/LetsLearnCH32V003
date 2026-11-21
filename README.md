@@ -208,11 +208,14 @@ The build warning from `ws2812b_dma_spi_led_driver.h` and the linker's
 "RWX permissions" warning are from ch32fun and are expected (the touch
 reader runs from RAM).
 
+
 ## Pins
 
 Pins are set by `#define`s at the top of each `.c` file. 
 Defaults are for a CH32V003F4P6 (TSSOP-20) dev board, which should also
 work for the CH32V003F4U6 (QFN-20).
+A consistent pinout is used for all exammples, when possible.
+
 
 ### Pins per stage (dev board)
 
@@ -237,7 +240,7 @@ work for the CH32V003F4U6 (QFN-20).
 | PD6 | LED | LED | LED | | | | | LED | LED | LED | | | |
 | PD7 | | | | | | | | | | | | | |
 
-What each pin does:
+Pin functions:
 - **SWIO (PD1):** programming, and debug printf (`make monitor`), in every
   stage. Only GND, 3V3 and SWIO go to the programmer.
 - **LED (PD6, stages 10-15, 50-62):** push-pull output. Wire it through 330 ohm to an
@@ -265,7 +268,7 @@ Other pins:
 - **PD1:** the dev board's LED is on it, wired to VDD, so it lights while SWIO is low
 - **PC3 (except 80, 90), PC5, PD0:** free
 
-### Examples 60 and 62 on the dev board (CH32V003F4P6, TSSOP-20)
+### Chip pins used on CH32V003F4P6 (TSSOP-20)
 
 ```
                         +----\/----+
@@ -275,8 +278,8 @@ Other pins:
        NRST    PD7   4 -|          |- 17  PC7  INT out (active low)
                PA1   5 -|          |- 16  PC6  WS2812 data (SPI1 MOSI)
                PA2   6 -|          |- 15  PC5
-        GND    VSS   7 -|          |- 14  PC4  A2  pad3 (optional)
-               PD0   8 -|          |- 13  PC3
+        GND    VSS   7 -|          |- 14  PC4  A2  pad3 (oSCL)
+               PD0   8 -|          |- 13  PC3           (oSDA)
        3.3V    VDD   9 -|          |- 12  PC2  I2C SCL
     (button)   PC0  10 -|          |- 11  PC1  I2C SDA
                         +----------+
@@ -313,26 +316,28 @@ the touch pins.
   - CircuitPython needs pull-ups somewhere on the bus.
   - Consider 4.7k-10k pull-ups to VDD with a cut-jumper.
 
-## Captouch (stages 40-70)
+## Captouch 
 
 The V003 has no touch peripheral. `touch.h` uses ch32fun's ADC method:
 `ReadTouchPinSafe()` from `extralibs/ch32v00x_touch.h`, the same one as
 `examples/cap_touch_adc`. It does not use the EXTI/timer method from
 `examples/cap_touch_exti`.
 
-How a read works:
+How a captouch read works:
 
-1. Between reads the pin is driven high, which charges the pad.
+1. Between reads the pin is driven high, charging the pad.
 2. Start an ADC conversion, then switch the pin to input with the internal
    pull-down on (45k typ).
-3. The ADC samples partway down the RC discharge curve. More capacitance (a
-   finger) means a slower fall, so a higher reading.
+3. The ADC samples partway down the RC discharge curve. 
+   More capacitance (afinger) means a slower fall, so a higher reading.
 4. Repeat 3x per iteration with slightly different delays to average out ADC
    nonlinearity. `TOUCH_ITERS` (16) iterations are summed into one raw value
    (max 16*3*1023, fits in u16).
 
 What that means:
 
+- This is similar in basic concept to how `touchio` works but with a much 
+  stronger pull resistor and using an ADC instead of digital HIGH/LOW detection.
 - Pads must be on pins with an ADC channel (A0-A7, see Pins), so max 8 pads
 - No external resistors needed, the internal pull-down does the discharging
 - Much finer resolution than EXTI timing (ch32fun says EXTI is only good for
@@ -346,14 +351,14 @@ What that means:
 
 Wiring pads:
 
-- Wire each pad straight to its ADC pin, with short wires. Wire capacitance adds to the baseline,
-  and a finger near the wire reads as a touch.
-- Pads need no ground connection. The finger couples to the board's ground through your body.
-- External 1M pull-downs (like on synth/touchpads boards) are fine but not needed. They're about
-  20x weaker than the internal 45k, so they only shift the baseline a few percent.
+- Wire each pad straight to its ADC pin, with short wires. 
+- External 1M pull-downs (like on my synth/touchpads boards) are fine but 
+  not needed. They're about 20x weaker than the internal 45k, so they only shift 
+  the baseline a few percent.
   - With the resistors' common end tied to GND, they're 1M pull-downs.
   - With the common end floating, all pads are linked through 2M. Idle pads sit driven high, so
     the common floats near VDD. That's also a small, steady shift.
+  - I've been leaving them floating and seems okay.
 
 Processing in `touch_update()`, per pad:
 
@@ -367,7 +372,7 @@ Processing in `touch_update()`, per pad:
 - **Wheel position:** take the strongest touched pad, then interpolate
   toward its stronger neighbor. Integer math only (no FPU), no dead zones.
 
-## Register map (custom mode, stages 30, 50, 60)
+## I2C Register map (examples 30, 50, 60)
 
 1-byte register address, auto-incrementing. u16 values are little-endian.
 
@@ -391,7 +396,7 @@ Processing in `touch_update()`, per pad:
 - status LED: lights the LED on PD6 (50 and 60)
 - INT asserts while `TOUCH_EVENTS != 0` and `CONFIG` bit0 is set
 
-## TouchwheelSAO clone map (stage 62)
+## TouchwheelSAO clone I2C register map (stage 62)
 
 62 is 60 with registers 0x00-0x1B laid out like the
 [TouchwheelSAO](https://github.com/todbot/TouchwheelSAO), so the SAO's own host driver
@@ -423,7 +428,7 @@ Processing in `touch_update()`, per pad:
   - `THRESH` is a delta above baseline and writable. The SAO's is an absolute count.
   - Multi-byte reads work, and LEDs don't fade out after a touch.
 
-## OLED map (stage 90)
+## I2C OLED register map (stage 90)
 
 Default address 0x55. 1-byte register address, auto-incrementing.
 
@@ -441,6 +446,8 @@ Send a command as one write, `[0x06, cmd, args...]`. Wait until `STATUS` bit0 is
 before the next one: a command sent while busy is dropped. Draw commands only change the
 framebuffer. `show` sends it to the OLED (18 ms), or set autoshow to show after every command.
 Colors are 0 or 1.
+
+### I2C OLED drawing commands
 
 | Cmd | Name | Args |
 |---|---|---|
