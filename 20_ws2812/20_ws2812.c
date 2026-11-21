@@ -1,4 +1,4 @@
-// ws2812.c -- drive several WS2812s with SPI+DMA, no CPU bit-banging
+// 20_ws2812.c -- drive several WS2812s with SPI+DMA, no CPU bit-banging
 // 14 Nov 2026 - @todbot / Tod Kurt
 //
 // LED data on PC6 (fixed: it's SPI1 MOSI). 5V LEDs want a 74AHCT1G125 buffer.

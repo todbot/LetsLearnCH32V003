@@ -1,4 +1,4 @@
-// touch_printf.c -- read captouch pads, printf values for tuning
+// 40_touch_printf.c -- read captouch pads, printf values for tuning
 // 14 Nov 2026 - @todbot / Tod Kurt
 //
 // View with "make monitor". Each line per pad: raw baseline delta,

@@ -1,4 +1,4 @@
-// touchwheelsao_clone.c -- 60_touchwheel with the TouchwheelSAO register map
+// 62_touchwheelsao_clone.c -- 60_touchwheel with the TouchwheelSAO register map
 // 18 Nov 2026 - @todbot / Tod Kurt
 //
 // - I2C SDA on PC1, SCL on PC2

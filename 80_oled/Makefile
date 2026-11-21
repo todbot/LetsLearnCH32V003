@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=oled
+TARGET:=80_oled
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

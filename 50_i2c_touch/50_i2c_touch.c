@@ -1,4 +1,4 @@
-// i2c_touch.c -- I2C peripheral that reports captouch pads
+// 50_i2c_touch.c -- I2C peripheral that reports captouch pads
 // 14 Nov 2026 - @todbot / Tod Kurt
 //
 // - I2C SDA on PC1, SCL on PC2

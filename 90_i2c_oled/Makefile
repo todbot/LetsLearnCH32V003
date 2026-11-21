@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=i2c_oled
+TARGET:=90_i2c_oled
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

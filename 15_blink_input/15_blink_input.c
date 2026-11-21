@@ -1,4 +1,4 @@
-// blink_input.c -- set LED blink time by typing in "make monitor"
+// 15_blink_input.c -- set LED blink time by typing in "make monitor"
 // 15 Nov 2026 - @todbot / Tod Kurt
 //
 // Keys 1,2,...,9,0 pick 10 to 1000 ms, any other key picks a random time.

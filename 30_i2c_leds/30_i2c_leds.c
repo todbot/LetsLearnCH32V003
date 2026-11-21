@@ -1,4 +1,4 @@
-// i2c_leds.c -- I2C peripheral that sets WS2812 LED colors
+// 30_i2c_leds.c -- I2C peripheral that sets WS2812 LED colors
 // 14 Nov 2026 - @todbot / Tod Kurt
 //
 // - I2C SDA on PC1, SCL on PC2, needs pull-ups

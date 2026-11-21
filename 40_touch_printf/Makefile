@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=touch_printf
+TARGET:=40_touch_printf
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

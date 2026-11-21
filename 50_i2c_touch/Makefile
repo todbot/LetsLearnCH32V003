@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=i2c_touch
+TARGET:=50_i2c_touch
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

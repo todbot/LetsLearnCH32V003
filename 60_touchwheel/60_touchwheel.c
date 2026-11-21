@@ -1,4 +1,4 @@
-// touchwheel.c -- I2C peripheral with captouch pads and WS2812 LEDs
+// 60_touchwheel.c -- I2C peripheral with captouch pads and WS2812 LEDs
 // 14 Nov 2026 - @todbot / Tod Kurt
 //
 // - I2C SDA on PC1, SCL on PC2

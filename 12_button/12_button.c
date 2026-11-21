@@ -1,4 +1,4 @@
-// button.c -- read the dev board's button, toggle LED on each press
+// 12_button.c -- read the dev board's button, toggle LED on each press
 // 16 Nov 2026 - @todbot / Tod Kurt
 //
 // Dev board button connects PC0 to VDD, so it needs a pull-down and reads 1 when pressed.

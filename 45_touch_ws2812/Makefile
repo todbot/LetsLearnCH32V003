@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=touch_ws2812
+TARGET:=45_touch_ws2812
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

@@ -1,4 +1,4 @@
-// blink.c -- blink an LED and printf, to test toolchain + programmer
+// 10_blink.c -- blink an LED and printf, to test toolchain + programmer
 // 14 Nov 2026 - @todbot / Tod Kurt
 //
 // Wire LED + 330 ohm resistor from LED_PIN to GND

@@ -1,4 +1,4 @@
-// seesaw.c -- touchwheel that speaks Adafruit seesaw (STATUS, NEOPIXEL, TOUCH)
+// 70_seesaw.c -- touchwheel that speaks Adafruit seesaw (STATUS, NEOPIXEL, TOUCH)
 // 14 Nov 2026 - @todbot / Tod Kurt
 //
 // - I2C SDA on PC1, SCL on PC2, LED data on PC6

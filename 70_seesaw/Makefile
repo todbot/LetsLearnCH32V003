@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=seesaw
+TARGET:=70_seesaw
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

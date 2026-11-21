@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=blink_input
+TARGET:=15_blink_input
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

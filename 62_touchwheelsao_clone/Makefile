@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=touchwheelsao_clone
+TARGET:=62_touchwheelsao_clone
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

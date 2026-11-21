@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=button
+TARGET:=12_button
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun

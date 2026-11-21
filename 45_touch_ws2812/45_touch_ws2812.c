@@ -1,4 +1,4 @@
-// touch_ws2812.c -- read captouch pads, light LED n while pad n is touched
+// 45_touch_ws2812.c -- read captouch pads, light LED n while pad n is touched
 // 15 Nov 2026 - @todbot / Tod Kurt
 //
 // 40_touch_printf plus 20_ws2812. LED data on PC6.

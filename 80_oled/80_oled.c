@@ -1,4 +1,4 @@
-// oled.c -- draw text and graphics on a 128x64 SSD1306 I2C OLED
+// 80_oled.c -- draw text and graphics on a 128x64 SSD1306 I2C OLED
 // 16 Nov 2026 - @todbot / Tod Kurt
 //
 // OLED on bit-banged I2C (SDA PC3, SCL PC4), leaving I2C1 (PC1/PC2) free for

@@ -1,6 +1,6 @@
 all : flash
 
-TARGET:=touchwheel
+TARGET:=60_touchwheel
 TARGET_MCU?=CH32V003
 
 CH32FUN?=../ch32fun/ch32fun
