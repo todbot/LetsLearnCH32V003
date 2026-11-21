@@ -240,8 +240,8 @@ What each pin does:
 - **btn (PC0, stage 12):** the dev board's button connects PC0 to VDD, so it's read as an input
   with pull-down and a press reads 1. In every stage, never drive PC0 low: a press would short
   VDD to it.
-- **SDA/SCL (PC1/PC2):** I2C1, alternate-function open-drain. The host
-  provides the pull-ups. These pins are 5V tolerant.
+- **SDA/SCL (PC1/PC2):** I2C1, alternate-function open-drain. Needs pull-ups somewhere on the
+  bus, most hosts don't have them. These pins are 5V tolerant.
 - **LEDs (PC6):** WS2812 data. It is SPI1 MOSI, fixed by the driver. Use a
   74AHCT1G125 buffer for 5V LEDs.
 - **pad0-3:** captouch on ADC channels. PC4=A2, PD2=A3, PD3=A4, PD4=A7.
@@ -447,6 +447,7 @@ Colors are 0 or 1.
 | 0x15 | circle | x, y, r, color |
 | 0x16 | fill_circle | x, y, r, color |
 | 0x17 | print | x, y, size (1-8), color, text (up to 36 chars) |
+| 0x18 | invert | on (0 or 1), takes effect without show |
 | 0xA5 | reset | |
 
 ## Seesaw mode (stage 70)

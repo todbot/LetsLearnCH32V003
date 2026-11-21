@@ -52,6 +52,7 @@ enum {
     CMD_CIRCLE     = 0x15,  // x, y, r, color
     CMD_FILLCIRCLE = 0x16,  // x, y, r, color
     CMD_PRINT      = 0x17,  // x, y, size, color, text...
+    CMD_INVERT     = 0x18,  // on, done by the OLED so no show needed
     CMD_RESET      = 0xA5,
 };
 
@@ -94,6 +95,7 @@ static void run_cmd( uint8_t c )
     uint8_t* a = args;
     switch( c ) {
         case CMD_SHOW:       ssd1306_refresh(); return;
+        case CMD_INVERT:     ssd1306_cmd( a[0] ? SSD1306_INVERTDISPLAY : SSD1306_NORMALDISPLAY ); return;
         case CMD_CLEAR:      ssd1306_setbuf( a[0] ); break;
         case CMD_PIXEL:      ssd1306_drawPixel( a[0], a[1], a[2] ); break;
         case CMD_LINE:       ssd1306_drawLine( a[0], a[1], a[2], a[3], a[4] ); break;

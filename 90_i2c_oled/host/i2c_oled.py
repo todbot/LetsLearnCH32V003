@@ -11,7 +11,7 @@ CONFIG_AUTOSHOW = 0x02
 
 _CMD_SHOW, _CMD_CLEAR, _CMD_PIXEL, _CMD_LINE = 0x01, 0x10, 0x11, 0x12
 _CMD_RECT, _CMD_FILLRECT, _CMD_CIRCLE, _CMD_FILLCIRCLE = 0x13, 0x14, 0x15, 0x16
-_CMD_PRINT, _CMD_RESET = 0x17, 0xA5
+_CMD_PRINT, _CMD_INVERT, _CMD_RESET = 0x17, 0x18, 0xA5
 
 class I2COLED:
     width, height = 128, 64
@@ -90,6 +90,10 @@ class I2COLED:
     def print(self, x, y, text, size=1, color=1):
         """8x8 font, size scales it 1-8x. text over 36 chars is cut"""
         self._cmd(_CMD_PRINT, x, y, size, color, *text.encode()[:_ARGS_LEN - 4])
+
+    def invert(self, on=True):
+        """invert the whole display, no show() needed"""
+        self._cmd(_CMD_INVERT, 1 if on else 0)
 
     def reset(self):
         self._cmd(_CMD_RESET)

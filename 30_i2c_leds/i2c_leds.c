@@ -1,7 +1,7 @@
 // i2c_leds.c -- I2C peripheral that sets WS2812 LED colors
 // 14 Nov 2026 - @todbot / Tod Kurt
 //
-// - I2C SDA on PC1, SCL on PC2, needs pull-ups (Stemma QT hosts have them)
+// - I2C SDA on PC1, SCL on PC2, needs pull-ups
 // - LED data on PC6
 // - Register map is a subset of the full one in 60_touchwheel
 // - Write [reg, data...] to set regs, write [reg] then read to get regs

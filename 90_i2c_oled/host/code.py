@@ -19,16 +19,20 @@ oled.show()
 time.sleep(2)
 
 # bouncing ball, frame counter
-x, y, dx, dy = 20, 40, 3, 2
+BALL_R = 5  # radius, 1-30
+x_min, x_max = BALL_R + 1, oled.width - 2 - BALL_R  # stay inside the border
+y_min, y_max = BALL_R + 1, oled.height - 2 - BALL_R
+x, y, dx, dy = oled.width // 2, oled.height // 2, 3, 2
 frames, last = 0, time.monotonic()
 fps = 0
 while True:
     x, y = x + dx, y + dy
-    if not 6 <= x <= 121: dx = -dx
-    if not 6 <= y <= 57: dy = -dy
+    # clamp too, so a big step can't push the ball past the edge
+    if not x_min <= x <= x_max: dx, x = -dx, min(max(x, x_min), x_max)
+    if not y_min <= y <= y_max: dy, y = -dy, min(max(y, y_min), y_max)
     oled.clear()
     oled.rect(0, 0, 128, 64)
-    oled.fill_circle(x, y, 5)
+    oled.fill_circle(x, y, BALL_R)
     oled.print(4, 4, "fps %d" % fps)
     oled.show()
     frames += 1
