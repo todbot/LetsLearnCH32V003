@@ -74,12 +74,12 @@ my breadboard is set up for most of the sketches.
 Exact [pins used](#pins) described below. In the above photo, the following 
 are wired up:
 
-- CH32V003 dev board
-- ESP32-S2 Mini as CH32v003progrmamer
+- [CH32V003 dev board](https://link.amazon/B037HJH30)
+- [ESP32-S2 Mini](https://link.amazon/B0aWGqh70) as CH32v003progrmamer
 - LED w/ resistor
-- WS2812 RGB LED strip 
-- 3 pad captouch touchwheel
-- StemmaQT adapter hooked up to QTPy RP2040 for I2C
+- [WS2812 RGB LED stick](https://link.amazon/B0ed1a05R) 
+- 3 pad [captouch touchwheel](https://github.com/todbot/touchpads#touchwheels)
+- [Qwiic/StemmaQT adapter](https://www.sparkfun.com/sparkfun-qwiic-adapter.html) hooked up to QTPy RP2040 for I2C
 
 ## Software setup
  
